@@ -1,4 +1,11 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# DatoCMS Next.js starter
+
+Everything you need to know to build a Next.js project powered by DatoCMS.
+
+## Featuring
+
+- [Fetching contents](lib/fetch-contents.ts) from DatoCMS
+- Using [cache tags](lib/cache-tags.ts)
 
 ## Getting Started
 
