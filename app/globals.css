@@ -5,16 +5,16 @@
 *,
 *::before,
 *::after {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 * {
-	margin: 0;
+  margin: 0;
 }
 
 body {
-	line-height: 1.5;
-	-webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 img,
@@ -22,15 +22,15 @@ picture,
 video,
 canvas,
 svg {
-	display: block;
-	max-width: 100%;
+  display: block;
+  max-width: 100%;
 }
 
 input,
 button,
 textarea,
 select {
-	font: inherit;
+  font: inherit;
 }
 
 p,
@@ -40,38 +40,38 @@ h3,
 h4,
 h5,
 h6 {
-	overflow-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 html {
-	font-family: sans-serif;
+  font-family: sans-serif;
 }
 
 header,
 main {
-	margin: 1rem auto;
-	max-width: 128ch;
+  margin: 1rem auto;
+  max-width: 128ch;
 
-	& > * {
-		margin-bottom: 1rem;
-	}
+  & > * {
+    margin-bottom: 1rem;
+  }
 
-	& > *:last-child {
-		margin-bottom: 0;
-	}
+  & > *:last-child {
+    margin-bottom: 0;
+  }
 }
 
 header {
-	border-bottom: 1px solid slategrey;
+  border-bottom: 1px solid slategrey;
 }
 
 .horizontal.navigation {
-	display: flex;
-	padding: 0;
+  display: flex;
+  padding: 0;
 
-	> li {
-		text-align: center;
-		flex: 1;
-		list-style-type: none;
-	}
+  > li {
+    text-align: center;
+    flex: 1;
+    list-style-type: none;
+  }
 }

@@ -17,11 +17,16 @@ export type CacheTag = string & { readonly _: unique symbol };
  * Converts a string like `"tag-a, tag-2, other-tag"` into
  * an array of string properly typed: `['tag-a', 'tag-2', 'other-tag']`.
  */
-export function parseCommaSeparatedTagString(string: undefined | null | string) {
-	if (!string) return [];
+export function parseCommaSeparatedTagString(
+  string: undefined | null | string,
+) {
+  if (!string) return [];
 
-	return (string.split(' ') || []) as CacheTag[];
+  return (string.split(" ") || []) as CacheTag[];
 }
 
-export { associateFetchIdToTags, retrieveFetchIdsByTags, deleteTags } from './vercel-kv';
-
+export {
+  associateFetchIdToTags,
+  retrieveFetchIdsByTags,
+  deleteTags,
+} from "./vercel-kv";

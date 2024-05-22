@@ -22,9 +22,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Header />
-        <main>
-          {children}
-        </main>
+        <main>{children}</main>
       </body>
     </html>
   );

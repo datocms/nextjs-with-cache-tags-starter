@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import React from 'react'
+import Link from "next/link";
+import React from "react";
 
-import { executeQuery } from '@/lib/fetch-contents';
+import { executeQuery } from "@/lib/fetch-contents";
 
 const CURRENT_POST_QUERY = `
 query CurrentPost($slug: String) {
@@ -43,40 +43,53 @@ query PreviousAndNextPosts($firstPublishedAt: DateTime, $slug: String) {
 `;
 
 type Props = {
-  params: { slug: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
- 
+  params: { slug: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
 async function Page({ params }: Props) {
   const { slug } = params;
 
-	const { data: currentPostData, tags: currentPostTags } = await executeQuery(
-		CURRENT_POST_QUERY,
-		{ slug }
-	);
+  const { data: currentPostData, tags: currentPostTags } = await executeQuery(
+    CURRENT_POST_QUERY,
+    { slug },
+  );
 
-	const { currentPost } = currentPostData;
-	const { _firstPublishedAt: firstPublishedAt } = currentPost;
+  const { currentPost } = currentPostData;
+  const { _firstPublishedAt: firstPublishedAt } = currentPost;
 
-	const { data: previousAndNextPostsData, tags: previousAndNextPostsTags } = await executeQuery(
-		PREVIOUS_AND_NEXT_POSTS_QUERY,
-		{ firstPublishedAt, slug }
-	);
+  const { data: previousAndNextPostsData, tags: previousAndNextPostsTags } =
+    await executeQuery(PREVIOUS_AND_NEXT_POSTS_QUERY, {
+      firstPublishedAt,
+      slug,
+    });
 
-	const { previousPost, nextPost } = previousAndNextPostsData;
+  const { previousPost, nextPost } = previousAndNextPostsData;
 
-   return (<>
-    <h1>{currentPost.title}</h1>
+  return (
+    <>
+      <h1>{currentPost.title}</h1>
 
-    <ul className="horizontal navigation">
-      <li>
-        Previous: {previousPost ? <Link href={`/${previousPost.slug}`}>{previousPost.title}</Link> : "—"}
-      </li>
-      <li>
-        Next:  {nextPost ? <Link href={`/${nextPost.slug}`}>{nextPost.title}</Link> : "—"}
-      </li>
-    </ul>
-   </>)
- }
- 
- export default Page
+      <ul className="horizontal navigation">
+        <li>
+          Previous:{" "}
+          {previousPost ? (
+            <Link href={`/${previousPost.slug}`}>{previousPost.title}</Link>
+          ) : (
+            "—"
+          )}
+        </li>
+        <li>
+          Next:{" "}
+          {nextPost ? (
+            <Link href={`/${nextPost.slug}`}>{nextPost.title}</Link>
+          ) : (
+            "—"
+          )}
+        </li>
+      </ul>
+    </>
+  );
+}
+
+export default Page;

@@ -1,5 +1,5 @@
-import { executeQuery } from '@/lib/fetch-contents';
-import React from 'react'
+import { executeQuery } from "@/lib/fetch-contents";
+import React from "react";
 
 const QUERY = `
   {
@@ -11,17 +11,22 @@ const QUERY = `
   }
 `;
 
-type Props = {}
+type Props = {};
 
 async function LastPosts({}: Props) {
   const { data, tags } = await executeQuery(QUERY);
 
   const { allPosts } = data;
 
-  return (<ul>
-    {allPosts.map(({ slug, title }) => <li key={slug}><a href={`/${slug}`}>{title}</a></li>)}
-  </ul>)
-  
+  return (
+    <ul>
+      {allPosts.map(({ slug, title }) => (
+        <li key={slug}>
+          <a href={`/${slug}`}>{title}</a>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
-export default LastPosts
+export default LastPosts;
