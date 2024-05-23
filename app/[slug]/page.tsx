@@ -42,6 +42,8 @@ query PreviousAndNextPosts($firstPublishedAt: DateTime, $slug: String) {
 }
 `;
 
+export const dynamic = "error";
+
 type Props = {
   params: { slug: string };
   searchParams: { [key: string]: string | string[] | undefined };
