@@ -4,6 +4,17 @@ import {
   parseCommaSeparatedTagString,
 } from "./cache-tags";
 
+function generateFetchId(query: string, variables: {}) {
+  const fetchId = createHash("sha1")
+    .update(query)
+    .update(JSON.stringify(variables))
+    .digest("hex");
+
+  const prefixedFetchId = `fetchId:${fetchId}`;
+
+  return prefixedFetchId;
+}
+
 /**
  * `executeQuery` uses `fetch` (passed as a parameter) to make a request to the
  * DatoCMS GraphQL API
@@ -13,10 +24,7 @@ export async function executeQuery(query = "", variables = {}) {
     throw new Error(`Query is not valid`);
   }
 
-  const fetchId = createHash("sha1")
-    .update(query)
-    .update(JSON.stringify(variables))
-    .digest("hex");
+  const fetchId = generateFetchId(query, variables);
 
   const response = await fetch("https://graphql.datocms.com/", {
     method: "POST",

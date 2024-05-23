@@ -20,7 +20,7 @@ import type { CacheTag } from "./cache-tags";
  */
 export async function associateFetchIdToTags(id: string, tags: CacheTag[]) {
   for (const tag of tags) {
-    await kv.sadd(tag, `fetchId:${id}`);
+    await kv.sadd(tag, id);
   }
 }
 
@@ -39,7 +39,9 @@ export async function retrieveFetchIdsByTags(tags: CacheTag[]) {
   );
 
   // See: https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
-  return fetchIds.flat().filter((value, index, array) => array.indexOf(value) === index);
+  return fetchIds
+    .flat()
+    .filter((value, index, array) => array.indexOf(value) === index);
 }
 
 function chunkArray<T>(array: T[], size: number) {
