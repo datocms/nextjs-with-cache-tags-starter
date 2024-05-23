@@ -45,10 +45,6 @@ export async function executeQuery(query = "", variables = {}) {
     },
   });
 
-  response.headers.forEach((value, name) => {
-    console.log(`${name}: ${value}`);
-  });
-
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${JSON.stringify(response)}`);
   }
