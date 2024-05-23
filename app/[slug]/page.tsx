@@ -12,6 +12,10 @@ query CurrentPost($slug: String) {
       value
     }
     _firstPublishedAt
+    author {
+      id
+      name
+    }
   }
 }
 `;
@@ -71,6 +75,8 @@ async function Page({ params }: Props) {
   return (
     <>
       <h1>{currentPost.title}</h1>
+
+      <p><Link href={`/authors/${currentPost.author.id}`}>{currentPost.author.name}</Link></p>
 
       <ul className="horizontal navigation">
         <li>
