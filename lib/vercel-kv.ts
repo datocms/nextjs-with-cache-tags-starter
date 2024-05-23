@@ -28,7 +28,7 @@ export async function associateFetchIdToTags(id: string, tags: CacheTag[]) {
  * Find all the unique pathnames of the pages associated to a list of passed tags.
  */
 export async function retrieveFetchIdsByTags(tags: CacheTag[]) {
-  const fatchIds = await Promise.all(
+  const fetchIds = await Promise.all(
     tags.map(async (tag) => {
       try {
         return await kv.smembers(tag);
@@ -38,8 +38,8 @@ export async function retrieveFetchIdsByTags(tags: CacheTag[]) {
     }),
   );
 
-  // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set#remove_duplicate_elements_from_an_array
-  return [...new Set(fatchIds.flat())];
+  // See: https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
+  return fetchIds.flat().filter((value, index, array) => array.indexOf(value) === index);
 }
 
 function chunkArray<T>(array: T[], size: number) {

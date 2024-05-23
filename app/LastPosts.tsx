@@ -20,7 +20,7 @@ async function LastPosts({}: Props) {
 
   return (
     <ul>
-      {allPosts.map(({ slug, title }) => (
+      {allPosts.map(({ slug, title }: { slug: string; title: string }) => (
         <li key={slug}>
           <a href={`/${slug}`}>{title}</a>
         </li>
