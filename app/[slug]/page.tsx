@@ -88,6 +88,15 @@ async function Page({ params }: Props) {
           )}
         </li>
       </ul>
+
+      <footer>
+        <p>
+          Cache tags from page queries:
+          <code>
+            {JSON.stringify([...currentPostTags, ...previousAndNextPostsTags])}
+          </code>
+        </p>
+      </footer>
     </>
   );
 }
