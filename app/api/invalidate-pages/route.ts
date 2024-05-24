@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { CacheTag, deleteTags, retrieveFetchIdsByTags } from "@/lib/cache-tags";
-import { revalidateQueriesByFetchId } from "@/lib/vercel-cache-revalidate-strategy";
+import { CacheTag } from "@/lib/cache-tags";
+import { revalidateQueriesUsingCacheTags } from "@/lib/vercel-cache-revalidate-strategy";
 
 export const dynamic = "force-dynamic"; // defaults to auto
 
@@ -26,16 +26,7 @@ export async function POST(request: Request) {
     (tag: string) => tag as CacheTag,
   );
 
-  // Retrieve from the key-value storage all the identifiers associated to the
-  // cache tags signaled as outdated..
-  const fetchIdsToRevalidate = await retrieveFetchIdsByTags(cacheTags);
+  revalidateQueriesUsingCacheTags(cacheTags);
 
-  // Then we're going to delete the cacheTags from the key-value storage.
-  await deleteTags(cacheTags);
-
-  revalidateQueriesByFetchId(fetchIdsToRevalidate);
-
-  // For illustrational purpose, the list of rebuilt pathname is returned. In a
-  // real-world scenario, this is probably not needed.
-  return NextResponse.json({ cacheTags, fetchIds: fetchIdsToRevalidate });
+  return NextResponse.json({ cacheTags });
 }

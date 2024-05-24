@@ -1,7 +1,8 @@
 import { revalidateTag } from "next/cache";
+import { CacheTag } from "./cache-tags";
 
-export function revalidateQueriesByFetchId(fetchIds: string[]) {
-  for (const fetchId of fetchIds) {
-    revalidateTag(fetchId);
+export function revalidateQueriesUsingCacheTags(cacheTags: CacheTag[]) {
+  for (const tag of cacheTags) {
+    revalidateTag(tag);
   }
 }
