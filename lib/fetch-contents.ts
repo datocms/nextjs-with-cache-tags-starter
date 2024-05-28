@@ -1,7 +1,5 @@
-import { createHash } from "crypto";
 import {
   CacheTag,
-  associateFetchIdToTags,
   parseCommaSeparatedTagString,
 } from "./cache-tags";
 
