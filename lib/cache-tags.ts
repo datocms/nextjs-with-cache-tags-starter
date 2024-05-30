@@ -4,12 +4,12 @@
  * that is distinguishable from plain strings even though it is still
  * fundamentally a string.
  *
+ * [bt]: https://egghead.io/blog/using-branded-types-in-typescript
+ *
  * Even though CacheTag  is technically a string, it is treated as a distinct
  * type because of the unique symbol. This pattern is used to add a layer of
  * type safety, ensuring that only values explicitly marked as CacheTag can be
  * used where a CacheTag is expected.
- *
- * [bt]: https://egghead.io/blog/using-branded-types-in-typescript
  */
 export type CacheTag = string & { readonly _: unique symbol };
 
@@ -25,8 +25,3 @@ export function parseCommaSeparatedTagString(
   return (string.split(" ") || []) as CacheTag[];
 }
 
-export {
-  associateFetchIdToTags,
-  retrieveFetchIdsByTags,
-  deleteTags,
-} from "./vercel-kv";
