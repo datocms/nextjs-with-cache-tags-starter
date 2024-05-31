@@ -1,9 +1,10 @@
-import {
-  CacheTag,
-  parseCommaSeparatedTagString,
-} from "./cache-tags";
+import { CacheTag, parseCommaSeparatedTagString } from "./cache-tags";
 
-async function fetchFromDatoCMS(query: string, variables = {}, tags: CacheTag[]) {
+async function fetchFromDatoCMS(
+  query: string,
+  variables = {},
+  tags: CacheTag[]
+) {
   return fetch("https://graphql.datocms.com/", {
     method: "POST",
     // Headers are used to instruct DatoCMS on how to treat the request:
@@ -20,7 +21,7 @@ async function fetchFromDatoCMS(query: string, variables = {}, tags: CacheTag[])
     cache: "force-cache",
     next: {
       tags,
-    }
+    },
   });
 }
 
@@ -28,22 +29,27 @@ async function fetchFromDatoCMS(query: string, variables = {}, tags: CacheTag[])
  * `executeQuery` uses `fetch` to make a request to the
  * DatoCMS GraphQL API
  */
-export async function executeQuery(query = "", variables = {}) {
+export async function executeQuery<Data = unknown>(query = "", variables = {}) {
   if (!query) {
     throw new Error(`Query is not valid`);
   }
 
-  const response = await fetchFromDatoCMS(query, variables, [])
+  const response = await fetchFromDatoCMS(query, variables, []);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${JSON.stringify(response)}`);
   }
 
-  const { data, errors } = await response.json();
+  const { data, errors } = (await response.json()) as {
+    data: Data;
+    errors?: unknown;
+  };
 
   if (errors) {
     throw new Error(
-      `Something went wrong while executing the query: ${JSON.stringify(errors)}`,
+      `Something went wrong while executing the query: ${JSON.stringify(
+        errors
+      )}`
     );
   }
 
@@ -51,8 +57,8 @@ export async function executeQuery(query = "", variables = {}) {
    * Converts the string of cache tags received via headers into an array of
    * tags of `CacheTag` type.
    */
-  const tags = parseCommaSeparatedTagString(
-    response.headers.get("x-cache-tags"),
+  const cacheTags = parseCommaSeparatedTagString(
+    response.headers.get("x-cache-tags")
   );
 
   /**
@@ -62,13 +68,13 @@ export async function executeQuery(query = "", variables = {}) {
    *
    * What happens behind the curtains is that `fetch` leverages the request
    * cache (so no second call to DatoCMS) and marks the request with the tags we
-   * pass: it's a win-win! 
+   * pass: it's a win-win!
    */
-  await fetchFromDatoCMS(query, variables, tags)
+  await fetchFromDatoCMS(query, variables, cacheTags);
 
   /**
    * For educational purpose, tags are returned together with the data: in a
    * real-world application this is probably not needed.
    */
-  return { data, tags };
+  return { data, cacheTags };
 }

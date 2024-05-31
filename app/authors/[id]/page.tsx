@@ -1,14 +1,32 @@
-import Link from "next/link";
 import React from "react";
+import { Image } from "react-datocms";
 
 import { executeQuery } from "@/lib/fetch-contents";
 
 const AUTHOR_QUERY = `
-query Author($id: ItemId) {
-  author(filter: {id: {eq: $id}}) {
-    name
+  query Author($id: ItemId) {
+    author(filter: {id: {eq: $id}}) {
+      name
+      picture {
+        responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 }) {
+          ...responsiveImageFragment
+        }
+      }
+    }
   }
-}
+
+  fragment responsiveImageFragment on ResponsiveImage {
+    srcSet
+    webpSrcSet
+    sizes
+    src
+    width
+    height
+    aspectRatio
+    alt
+    title
+    base64
+  }
 `;
 
 export const dynamic = "error";
@@ -21,25 +39,19 @@ type Props = {
 async function Page({ params }: Props) {
   const { id } = params;
 
-  const { data: authorData, tags: authorTags } = await executeQuery(
+  const { data: authorData, cacheTags: authorTags } = await executeQuery(
     AUTHOR_QUERY,
-    { id },
+    { id }
   );
 
   const { author } = authorData;
 
   return (
     <>
-      <h1>{author.name}</h1>
-
-      <footer>
-        <p>
-          Cache tags from page queries:
-          <code>
-            {JSON.stringify(authorTags)}
-          </code>
-        </p>
-      </footer>
+      <article className="grid">
+        <Image data={author.picture.responsiveImage} />
+        <h1>{author.name}</h1>
+      </article>
     </>
   );
 }
