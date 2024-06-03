@@ -1,4 +1,4 @@
-import { CacheTag, parseCommaSeparatedTagString } from "./cache-tags";
+import { CacheTag, parseSpaceSeparatedTagString } from "./cache-tags";
 
 async function fetchFromDatoCMS(
   query: string,
@@ -57,7 +57,7 @@ export async function executeQuery<Data = unknown>(query = "", variables = {}) {
    * Converts the string of cache tags received via headers into an array of
    * tags of `CacheTag` type.
    */
-  const cacheTags = parseCommaSeparatedTagString(
+  const cacheTags = parseSpaceSeparatedTagString(
     response.headers.get("x-cache-tags")
   );
 

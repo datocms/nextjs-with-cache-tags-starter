@@ -14,10 +14,10 @@
 export type CacheTag = string & { readonly _: unique symbol };
 
 /**
- * Converts a string like `"tag-a, tag-2, other-tag"` into
+ * Converts a string like `"tag-a tag-2 other-tag"` into
  * an array of string properly typed: `['tag-a', 'tag-2', 'other-tag']`.
  */
-export function parseCommaSeparatedTagString(
+export function parseSpaceSeparatedTagString(
   string: undefined | null | string,
 ) {
   if (!string) return [];
