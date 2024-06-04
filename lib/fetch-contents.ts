@@ -2,6 +2,8 @@ import type { TadaDocumentNode } from "gql.tada";
 import { print } from "graphql";
 import { CacheTag, parseSpaceSeparatedTagString } from "./cache-tags";
 
+const BATCH_SIZE = 64;
+
 async function fetchFromDatoCMS<
   Result = unknown,
   Variables = Record<string, unknown>
@@ -73,15 +75,23 @@ export async function executeQuery<
   );
 
   /**
-   * We strongly leverage request memoization here: what follows is the same
-   * identical request we did before: we only add the cache tags we just
-   * retrieved.
+   * We strongly leverage the data cache: what follows is the same identical
+   * request we did before: we only add the cache tags we just retrieved.
    *
-   * What happens behind the curtains is that `fetch` leverages the request
-   * cache (so no second call to DatoCMS) and marks the request with the tags we
-   * pass: it's a win-win!
+   * What happens behind the curtains is that `fetch` leverages cache (so no
+   * second call to DatoCMS) and marks the request with the tags we pass: it's a
+   * win-win!
+   *
+   * There's a little bit of complexity due to the limitations on the number of
+   * tags supported by the `fetch`: they must be 64 at most. So we cycle in
+   * batches of maximum 64 tags and execute the same request once for each
+   * batch.
    */
-  await fetchFromDatoCMS(query, variables, cacheTags);
+  for (let position = 0; position < cacheTags.length; position += BATCH_SIZE) {
+    const batch = cacheTags.slice(position, position + BATCH_SIZE);
+
+    await fetchFromDatoCMS(query, variables, batch);
+  }
 
   /**
    * For educational purpose, tags are returned together with the data: in a

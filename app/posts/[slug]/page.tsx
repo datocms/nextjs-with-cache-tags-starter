@@ -103,7 +103,16 @@ async function Page({ params }: Props) {
         </section>
       )}
       <header>
-        <h1>{currentPost.title}</h1>
+        <h1>
+          <span
+            data-tooltip={`The content of this page is generated with a GraphQL query that also returned these cache tags: "${currentPostTags.join(
+              ", "
+            )}"`}
+            data-placement="bottom"
+          >
+            {currentPost.title}
+          </span>
+        </h1>
       </header>
 
       {currentPost.content && (
@@ -133,7 +142,16 @@ async function Page({ params }: Props) {
         </p>
       )}
 
-      <h2>Siblings posts</h2>
+      <h2>
+        <span
+          data-tooltip={`The content of this section is generated with a GraphQL query that also returned these cache tags: "${previousAndNextPostsTags.join(
+            ", "
+          )}"`}
+          data-placement="bottom"
+        >
+          Siblings posts
+        </span>
+      </h2>
 
       <div className="grid">
         <div>

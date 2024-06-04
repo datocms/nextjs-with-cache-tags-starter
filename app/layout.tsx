@@ -59,7 +59,15 @@ export default async function RootLayout({
               </li>
               {lastPost && (
                 <li>
-                  <Link href={`/posts/${lastPost.slug}`}>Most recent post</Link>
+                  <Link
+                    href={`/posts/${lastPost.slug}`}
+                    data-tooltip={`This link is generated with a GraphQL query that also returned these cache tags: "${cacheTags.join(
+                      ", "
+                    )}"`}
+                    data-placement="bottom"
+                  >
+                    Most recent post
+                  </Link>
                 </li>
               )}
             </ul>
@@ -68,7 +76,16 @@ export default async function RootLayout({
         <main className="container">{children}</main>
         <footer className="container">
           <hr />
-          <p>This page has been generated on {new Date().toISOString()}</p>
+          <p>
+            This page has been generated on{" "}
+            <span
+              data-tooltip="This date is injected when the page is built: it won't change anymore, until some of the content changes and all the page is invalidated and, therefore, rebuilt at the first request."
+              data-placement="top
+              "
+            >
+              {new Date().toISOString()}
+            </span>
+          </p>
         </footer>
       </body>
     </html>

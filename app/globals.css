@@ -1,0 +1,8 @@
+@media (hover: hover) and (pointer: fine) {
+  [data-tooltip][data-placement=bottom]::before,
+  [data-tooltip][data-placement=top]::before {
+    width: 20rem;
+    max-width: 20rem;
+    white-space: normal;
+  }
+}

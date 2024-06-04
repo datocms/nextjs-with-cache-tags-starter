@@ -40,9 +40,7 @@ async function Page({ params }: Props) {
 
   const { author } = authorData;
 
-  if (!author) {
-    return null;
-  }
+  if (!author) return null;
 
   return (
     <>
@@ -50,7 +48,16 @@ async function Page({ params }: Props) {
         {author.picture?.responsiveImage && (
           <ContentImage responsiveImage={author.picture.responsiveImage} />
         )}
-        <h1>{author.name}</h1>
+        <h1>
+          <span
+            data-tooltip={`The content of this page is generated with a GraphQL query that also returned these cache tags: "${authorTags.join(
+              ", "
+            )}"`}
+            data-placement="bottom"
+          >
+            {author.name}
+          </span>
+        </h1>
       </article>
     </>
   );
