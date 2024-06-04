@@ -1,3 +1,13 @@
+/**
+ * We use [gql.tada][t] to have TypeScript automatically generated from the
+ * GraphQL schema.
+ *
+ * [t]: https://gql-tada.0no.co/
+ *
+ * This is the file that adapts the default behaviour of gql.data to the DatoCMS
+ * schema of the project.
+ */
+
 import type { introspection } from './graphql-env.d.ts';
 import { initGraphQLTada } from 'gql.tada';
 

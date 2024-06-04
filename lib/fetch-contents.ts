@@ -1,40 +1,12 @@
-import type { TadaDocumentNode } from "gql.tada";
 import { print } from "graphql";
+import type { TadaDocumentNode } from "gql.tada";
+
 import { CacheTag, parseSpaceSeparatedTagString } from "./cache-tags";
 
-const BATCH_SIZE = 64;
-
-async function fetchFromDatoCMS<
-  Result = unknown,
-  Variables = Record<string, unknown>
->(
-  query: TadaDocumentNode<Result, Variables>,
-  variables: Variables | undefined = undefined,
-  tags: CacheTag[]
-) {
-  return fetch("https://graphql.datocms.com/", {
-    method: "POST",
-    // Headers are used to instruct DatoCMS on how to treat the request:
-    headers: {
-      // - No token, no party: only authorized requests return data
-      Authorization: `Bearer ${process.env.PUBLIC_DATOCMS_API_TOKEN}`,
-      // - Only returns valid record
-      "X-Exclude-Invalid": "true",
-      // - Finally, return the cache tags together with the content.
-      "X-Cache-Tags": "true",
-    },
-    body: JSON.stringify({ query: print(query), variables }),
-    // Next uses some reasonable default for caching, but we explicite them all
-    cache: "force-cache",
-    next: {
-      tags,
-    },
-  });
-}
-
 /**
- * `executeQuery` uses `fetch` to make a request to the
- * DatoCMS GraphQL API
+ * `executeQuery` uses `fetch` to make a request to the DatoCMS GraphQL API.
+ * While executing the query, this function also stores the result in the cache
+ * and marks them with cache data returned from DatoCMS.
  */
 export async function executeQuery<
   Result = unknown,
@@ -98,4 +70,39 @@ export async function executeQuery<
    * real-world application this is probably not needed.
    */
   return { data, cacheTags };
+}
+
+const BATCH_SIZE = 64;
+
+async function fetchFromDatoCMS<
+  Result = unknown,
+  Variables = Record<string, unknown>
+>(
+  query: TadaDocumentNode<Result, Variables>,
+  variables: Variables | undefined = undefined,
+  tags: CacheTag[]
+) {
+  return fetch("https://graphql.datocms.com/", {
+    method: "POST",
+    // Headers are used to instruct DatoCMS on how to treat the request:
+    headers: {
+      // - No token, no party: only authorized requests return data
+      Authorization: `Bearer ${process.env.PUBLIC_DATOCMS_API_TOKEN}`,
+      // - Only return valid record
+      "X-Exclude-Invalid": "true",
+      // - Finally, return the cache tags together with the content.
+      "X-Cache-Tags": "true",
+    },
+    body: JSON.stringify({ query: print(query), variables }),
+
+    // Next uses some default for caching, but we explicite them all:
+    // - we want Next.js to cache the request, even if POST requests are usually
+    //   not cached.
+    cache: "force-cache",
+    next: {
+      // - we mark the request with the cache tags returned by DatoCMS, so that
+      //   we'll be able to invalidate any of them later.
+      tags,
+    },
+  });
 }

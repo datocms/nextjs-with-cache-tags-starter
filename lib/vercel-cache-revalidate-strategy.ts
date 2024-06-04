@@ -1,4 +1,5 @@
 import { revalidateTag } from "next/cache";
+
 import { CacheTag } from "./cache-tags";
 
 export function revalidateQueriesUsingCacheTags(cacheTags: CacheTag[]) {
