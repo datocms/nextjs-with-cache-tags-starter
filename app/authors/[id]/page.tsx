@@ -1,33 +1,27 @@
 import React from "react";
-import { Image } from "react-datocms";
 
 import { executeQuery } from "@/lib/fetch-contents";
+import { graphql } from "@/lib/graphql";
+import { ResponsiveImage } from "@/fragments/responsive-image";
+import ContentImage from "@/components/ResponsiveImage";
 
-const AUTHOR_QUERY = `
-  query Author($id: ItemId) {
-    author(filter: {id: {eq: $id}}) {
-      name
-      picture {
-        responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 }) {
-          ...responsiveImageFragment
+const AUTHOR_QUERY = graphql(
+  `
+    query Author($id: ItemId) {
+      author(filter: { id: { eq: $id } }) {
+        name
+        picture {
+          responsiveImage(
+            imgixParams: { fm: jpg, fit: crop, w: 2000, h: 1000 }
+          ) {
+            ...ResponsiveImage
+          }
         }
       }
     }
-  }
-
-  fragment responsiveImageFragment on ResponsiveImage {
-    srcSet
-    webpSrcSet
-    sizes
-    src
-    width
-    height
-    aspectRatio
-    alt
-    title
-    base64
-  }
-`;
+  `,
+  [ResponsiveImage]
+);
 
 export const dynamic = "error";
 
@@ -46,10 +40,16 @@ async function Page({ params }: Props) {
 
   const { author } = authorData;
 
+  if (!author) {
+    return null;
+  }
+
   return (
     <>
       <article className="grid">
-        <Image data={author.picture.responsiveImage} />
+        {author.picture?.responsiveImage && (
+          <ContentImage responsiveImage={author.picture.responsiveImage} />
+        )}
         <h1>{author.name}</h1>
       </article>
     </>

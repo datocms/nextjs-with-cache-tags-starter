@@ -6,15 +6,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-schema": "dotenv -c -- bash -c 'gql-tada generate-schema https://graphql.datocms.com --header \"Authorization: $PUBLIC_DATOCMS_API_TOKEN\"'",
+    "prepare": "npm run generate-schema"
   },
   "dependencies": {
+    "gql.tada": "^1.7.5",
     "next": "14.2.3",
     "react": "^18",
     "react-datocms": "^6.0.2",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "dotenv-cli": "^7.4.2",
+    "@0no-co/graphqlsp": "^1.12.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

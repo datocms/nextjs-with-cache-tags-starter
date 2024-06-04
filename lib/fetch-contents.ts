@@ -1,8 +1,13 @@
+import type { TadaDocumentNode } from "gql.tada";
+import { print } from "graphql";
 import { CacheTag, parseSpaceSeparatedTagString } from "./cache-tags";
 
-async function fetchFromDatoCMS(
-  query: string,
-  variables = {},
+async function fetchFromDatoCMS<
+  Result = unknown,
+  Variables = Record<string, unknown>
+>(
+  query: TadaDocumentNode<Result, Variables>,
+  variables: Variables | undefined = undefined,
   tags: CacheTag[]
 ) {
   return fetch("https://graphql.datocms.com/", {
@@ -16,7 +21,7 @@ async function fetchFromDatoCMS(
       // - Finally, return the cache tags together with the content.
       "X-Cache-Tags": "true",
     },
-    body: JSON.stringify({ query, variables }),
+    body: JSON.stringify({ query: print(query), variables }),
     // Next uses some reasonable default for caching, but we explicite them all
     cache: "force-cache",
     next: {
@@ -29,7 +34,10 @@ async function fetchFromDatoCMS(
  * `executeQuery` uses `fetch` to make a request to the
  * DatoCMS GraphQL API
  */
-export async function executeQuery<Data = unknown>(query = "", variables = {}) {
+export async function executeQuery<
+  Result = unknown,
+  Variables = Record<string, unknown>
+>(query: TadaDocumentNode<Result, Variables>, variables?: Variables) {
   if (!query) {
     throw new Error(`Query is not valid`);
   }
@@ -41,7 +49,7 @@ export async function executeQuery<Data = unknown>(query = "", variables = {}) {
   }
 
   const { data, errors } = (await response.json()) as {
-    data: Data;
+    data: Result;
     errors?: unknown;
   };
 

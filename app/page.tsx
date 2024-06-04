@@ -1,29 +1,23 @@
 import Link from "next/link";
 
 import { executeQuery } from "@/lib/fetch-contents";
+import { graphql } from "@/lib/graphql";
 
-type RecentPostData = {
-  recentPosts: Array<{
-    id: string;
-    title: string;
-    slug: string;
-    _publishedAt: string;
-  }>;
-};
+const RECENT_POSTS_QUERY = graphql(`
+  query RecentPosts {
+    recentPosts: allPosts(first: 3, orderBy: _publishedAt_DESC) {
+      id
+      title
+      slug
+      _publishedAt
+    }
+  }
+`);
 
 export const dynamic = "error";
 
 export default async function Home() {
-  const { data, cacheTags } = await executeQuery<RecentPostData>(`
-    {
-      recentPosts: allPosts(first: 3, orderBy: _publishedAt_DESC) {
-        id
-        title
-        slug
-        _publishedAt
-      }
-    }
-  `);
+  const { data, cacheTags } = await executeQuery(RECENT_POSTS_QUERY);
 
   const { recentPosts } = data;
 
@@ -44,8 +38,13 @@ export default async function Home() {
       <ul>
         {recentPosts.map(({ id, slug, title, _publishedAt }) => (
           <li key={id}>
-            <Link href={`/posts/${slug}`}>{title}</Link><br />
-            <small>{new Date(_publishedAt).toDateString()}</small>
+            <Link href={`/posts/${slug}`}>{title}</Link>
+            {_publishedAt && (
+              <>
+                <br />
+                <small>{new Date(_publishedAt).toDateString()}</small>
+              </>
+            )}
           </li>
         ))}
       </ul>

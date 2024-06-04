@@ -4,6 +4,7 @@ import Link from "next/link";
 import "./globals.css";
 
 import { executeQuery } from "@/lib/fetch-contents";
+import { graphql } from "@/lib/graphql";
 
 type LastPostData = {
   lastPost: {
@@ -11,6 +12,14 @@ type LastPostData = {
     title: string;
   };
 };
+
+const LAST_POST_QUERY = graphql(`
+  query LastPost {
+    lastPost: post(orderBy: _publishedAt_DESC) {
+      slug
+    }
+  }
+`);
 
 export const dynamic = "error";
 
@@ -24,14 +33,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { data, cacheTags } = await executeQuery<LastPostData>(`
-    query LastPost {
-      lastPost: post(orderBy: _publishedAt_DESC) {
-        slug
-        title
-      }
-    }
-  `);
+  const { data, cacheTags } = await executeQuery(LAST_POST_QUERY);
 
   const { lastPost } = data;
 
@@ -55,9 +57,11 @@ export default async function RootLayout({
               <li>
                 <Link href="/">Home</Link>
               </li>
-              <li>
-                <Link href={`posts/${lastPost.slug}`}>Most recent post</Link>
-              </li>
+              {lastPost && (
+                <li>
+                  <Link href={`/posts/${lastPost.slug}`}>Most recent post</Link>
+                </li>
+              )}
             </ul>
           </nav>
         </header>

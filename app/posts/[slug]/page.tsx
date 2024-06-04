@@ -1,82 +1,83 @@
 import Link from "next/link";
 import React from "react";
-import { StructuredText, Image } from "react-datocms";
+import { StructuredText, StructuredTextGraphQlResponse } from "react-datocms";
 
 import { executeQuery } from "@/lib/fetch-contents";
+import { ResultOf, graphql } from "@/lib/graphql";
+import { ResponsiveImage } from "@/fragments/responsive-image";
+import ContentImage from "@/components/ResponsiveImage";
 
-const CURRENT_POST_QUERY = `
-  query CurrentPost($slug: String) {
-    currentPost: post(filter: { slug: { eq: $slug }}) {
-      slug
-      title
-      content {
-        value
-        blocks {
-          __typename
-          ... on ImageBlockRecord {
-            id
-            image {
-              responsiveImage(
-                imgixParams: { fit: crop, w: 300, h: 300, auto: format }
-              ) {
-                ...responsiveImageFragment
+const CURRENT_POST_QUERY = graphql(
+  `
+    query CurrentPost($slug: String) {
+      currentPost: post(filter: { slug: { eq: $slug } }) {
+        title
+        content {
+          value
+          blocks {
+            __typename
+            ... on ImageBlockRecord {
+              id
+              image {
+                responsiveImage(
+                  imgixParams: { fit: crop, w: 300, h: 300, auto: format }
+                ) {
+                  ...ResponsiveImage
+                }
               }
             }
           }
         }
-      }
-      coverImage {
-        responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 }) {
-          ...responsiveImageFragment
+        coverImage {
+          responsiveImage(
+            imgixParams: { fm: jpg, fit: crop, w: 2000, h: 1000 }
+          ) {
+            ...ResponsiveImage
+          }
+        }
+        _firstPublishedAt
+        author {
+          id
+          name
         }
       }
-      _firstPublishedAt
-      author {
-        id
-        name
-      }
     }
-  }
+  `,
+  [ResponsiveImage]
+);
 
-  fragment responsiveImageFragment on ResponsiveImage {
-    srcSet
-    webpSrcSet
-    sizes
-    src
-    width
-    height
-    aspectRatio
-    alt
-    title
-    base64
-  }
-`;
+type Block = Exclude<
+  Exclude<ResultOf<typeof CURRENT_POST_QUERY>["currentPost"], null>["content"],
+  null
+>["blocks"][number];
 
-const PREVIOUS_AND_NEXT_POSTS_QUERY = `
+const PREVIOUS_AND_NEXT_POSTS_QUERY = graphql(`
   query PreviousAndNextPosts($firstPublishedAt: DateTime, $slug: String) {
     previousPost: post(
-      orderBy: _firstPublishedAt_DESC,
-      filter: {slug: {neq: $slug}, _firstPublishedAt: {lt: $firstPublishedAt}}
+      orderBy: _firstPublishedAt_DESC
+      filter: {
+        slug: { neq: $slug }
+        _firstPublishedAt: { lt: $firstPublishedAt }
+      }
     ) {
       id
       title
       slug
-      _status
-      _firstPublishedAt
     }
-    
+
     nextPost: post(
-      orderBy: _firstPublishedAt_ASC,
-      filter: {slug: {neq: $slug}, _firstPublishedAt: {gt: $firstPublishedAt}}
+      orderBy: _firstPublishedAt_ASC
+      filter: {
+        slug: { neq: $slug }
+        _firstPublishedAt: { gt: $firstPublishedAt }
+      }
     ) {
       id
       title
       slug
-      _status
-      _firstPublishedAt
     }
   }
-`;
+`);
 
 export const dynamic = "error";
 
@@ -92,6 +93,9 @@ async function Page({ params }: Props) {
     await executeQuery(CURRENT_POST_QUERY, { slug });
 
   const { currentPost } = currentPostData;
+
+  if (!currentPost) return null;
+
   const { _firstPublishedAt: firstPublishedAt } = currentPost;
 
   const {
@@ -106,38 +110,39 @@ async function Page({ params }: Props) {
 
   return (
     <>
-      <section>
-        <Image
-          data={currentPost.coverImage.responsiveImage}
-        />
-      </section>
-
+      {currentPost.coverImage?.responsiveImage && (
+        <section>
+          <ContentImage
+            responsiveImage={currentPost.coverImage.responsiveImage}
+          />
+        </section>
+      )}
       <header>
         <h1>{currentPost.title}</h1>
       </header>
 
       <StructuredText
-        data={currentPost.content}
+        data={currentPost.content as StructuredTextGraphQlResponse<Block>}
         renderBlock={({ record }) => {
           switch (record.__typename) {
-            case "ImageRecord":
-              return (
-                <Image
-                  data={record.image.responsiveImage}
-                />
-              );
+            case "ImageBlockRecord":
+              return record.image?.responsiveImage ? (
+                <ContentImage responsiveImage={record.image.responsiveImage} />
+              ) : null;
             default:
               return null;
           }
         }}
       />
 
-      <p>
-        Written by{" "}
-        <Link href={`/authors/${currentPost.author.id}`} role="button">
-          {currentPost.author.name}
-        </Link>
-      </p>
+      {currentPost.author && (
+        <p>
+          Written by{" "}
+          <Link href={`/authors/${currentPost.author.id}`} role="button">
+            {currentPost.author.name}
+          </Link>
+        </p>
+      )}
 
       <h2>Siblings posts</h2>
 
@@ -145,7 +150,9 @@ async function Page({ params }: Props) {
         <div>
           Previous:{" "}
           {previousPost ? (
-            <Link href={`/posts/${previousPost.slug}`}>{previousPost.title}</Link>
+            <Link href={`/posts/${previousPost.slug}`}>
+              {previousPost.title}
+            </Link>
           ) : (
             "—"
           )}
