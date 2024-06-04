@@ -16,7 +16,7 @@ async function fetchFromDatoCMS<
     headers: {
       // - No token, no party: only authorized requests return data
       Authorization: `Bearer ${process.env.PUBLIC_DATOCMS_API_TOKEN}`,
-      // - Only return valid record
+      // - Only returns valid record
       "X-Exclude-Invalid": "true",
       // - Finally, return the cache tags together with the content.
       "X-Cache-Tags": "true",
@@ -42,6 +42,9 @@ export async function executeQuery<
     throw new Error(`Query is not valid`);
   }
 
+  /**
+   * Executes a GraphQL query on DatoCMS API.
+   */
   const response = await fetchFromDatoCMS(query, variables, []);
 
   if (!response.ok) {

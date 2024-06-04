@@ -3,8 +3,11 @@ import React from "react";
 import { StructuredText, StructuredTextGraphQlResponse } from "react-datocms";
 
 import { executeQuery } from "@/lib/fetch-contents";
-import { ResultOf, graphql } from "@/lib/graphql";
+import { ResultOf, graphql, readFragment } from "@/lib/graphql";
+
+import { Content, readContentFragment } from "@/fragments/content";
 import { ResponsiveImage } from "@/fragments/responsive-image";
+
 import ContentImage from "@/components/ResponsiveImage";
 
 const CURRENT_POST_QUERY = graphql(
@@ -13,20 +16,7 @@ const CURRENT_POST_QUERY = graphql(
       currentPost: post(filter: { slug: { eq: $slug } }) {
         title
         content {
-          value
-          blocks {
-            __typename
-            ... on ImageBlockRecord {
-              id
-              image {
-                responsiveImage(
-                  imgixParams: { fit: crop, w: 300, h: 300, auto: format }
-                ) {
-                  ...ResponsiveImage
-                }
-              }
-            }
-          }
+          ...Content
         }
         coverImage {
           responsiveImage(
@@ -43,13 +33,8 @@ const CURRENT_POST_QUERY = graphql(
       }
     }
   `,
-  [ResponsiveImage]
+  [Content, ResponsiveImage]
 );
-
-type Block = Exclude<
-  Exclude<ResultOf<typeof CURRENT_POST_QUERY>["currentPost"], null>["content"],
-  null
->["blocks"][number];
 
 const PREVIOUS_AND_NEXT_POSTS_QUERY = graphql(`
   query PreviousAndNextPosts($firstPublishedAt: DateTime, $slug: String) {
@@ -121,19 +106,23 @@ async function Page({ params }: Props) {
         <h1>{currentPost.title}</h1>
       </header>
 
-      <StructuredText
-        data={currentPost.content as StructuredTextGraphQlResponse<Block>}
-        renderBlock={({ record }) => {
-          switch (record.__typename) {
-            case "ImageBlockRecord":
-              return record.image?.responsiveImage ? (
-                <ContentImage responsiveImage={record.image.responsiveImage} />
-              ) : null;
-            default:
-              return null;
-          }
-        }}
-      />
+      {currentPost.content && (
+        <StructuredText
+          data={readContentFragment(currentPost.content)}
+          renderBlock={({ record }) => {
+            switch (record.__typename) {
+              case "ImageBlockRecord":
+                return record.image?.responsiveImage ? (
+                  <ContentImage
+                    responsiveImage={record.image.responsiveImage}
+                  />
+                ) : null;
+              default:
+                return null;
+            }
+          }}
+        />
+      )}
 
       {currentPost.author && (
         <p>

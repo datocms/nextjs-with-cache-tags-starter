@@ -155,7 +155,7 @@ type CategoryRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   id: ItemId!
-  name: String
+  name: String!
   slug: String
 }
 
@@ -527,7 +527,7 @@ type ImageBlockRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   id: ItemId!
-  image: FileField
+  image: FileField!
 }
 
 input ImgixParams {
@@ -2484,16 +2484,16 @@ type PostRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  author: AuthorRecord
+  author: AuthorRecord!
   category: CategoryRecord
   content: PostModelContentField
-  coverImage: FileField
-  date: Date
+  coverImage: FileField!
+  date: Date!
   excerpt: String
   id: ItemId!
   seoReadabilityAnalysis: JsonField
   seoSettings: SeoField
-  slug: String
+  slug: String!
   title: String
 }
 
