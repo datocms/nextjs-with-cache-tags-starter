@@ -65,6 +65,8 @@ export async function executeQuery<
     await fetchFromDatoCMS(query, variables, batch);
   }
 
+  await fetchFromDatoCMS(query, variables, ["other-tag" as CacheTag]);
+
   /**
    * For educational purpose, tags are returned together with the data: in a
    * real-world application this is probably not needed.
