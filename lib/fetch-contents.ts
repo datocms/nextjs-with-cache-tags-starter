@@ -57,7 +57,7 @@ export async function executeQuery<
    * There's a little bit of complexity due to the limitations on the number of
    * tags supported by the `fetch`: they must be 64 at most. So we cycle in
    * batches of maximum 64 tags and execute the same request once for each
-   * batch.
+   * batch: each call incrementally tags the data cache.
    */
   for (let position = 0; position < cacheTags.length; position += BATCH_SIZE) {
     const batch = cacheTags.slice(position, position + BATCH_SIZE);

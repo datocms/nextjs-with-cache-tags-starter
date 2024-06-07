@@ -6,6 +6,7 @@ Everything you need to know to build a Next.js project powered by DatoCMS.
 
 - [Fetching contents](lib/fetch-contents.ts) from DatoCMS
 - Using [cache tags](lib/cache-tags.ts)
+- Using [DatoCMS components](https://github.com/datocms/react-datocms)
 
 ## Getting Started
 
