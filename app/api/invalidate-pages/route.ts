@@ -6,8 +6,6 @@ import { revalidateQueriesUsingCacheTags } from "@/lib/vercel-cache-revalidate-s
 export const dynamic = "force-dynamic"; // defaults to auto
 
 export async function POST(request: Request) {
-  console.log("Invalidation endpoint just called.");
-
   if (request.headers.get("Webhook-Token") !== process.env.WEBHOOK_TOKEN) {
     return NextResponse.json(
       {
@@ -26,13 +24,7 @@ export async function POST(request: Request) {
     (tag: string) => tag as CacheTag
   );
 
-  console.log(
-    `I'm about to invalidate the following cache tags: ${cacheTags.join(", ")}`
-  );
-
   revalidateQueriesUsingCacheTags(cacheTags);
-
-  console.log("Invalidation done!");
 
   return NextResponse.json({ cacheTags });
 }

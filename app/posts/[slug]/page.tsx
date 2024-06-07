@@ -1,9 +1,9 @@
 import Link from "next/link";
 import React from "react";
-import { StructuredText, StructuredTextGraphQlResponse } from "react-datocms";
+import { StructuredText } from "react-datocms";
 
 import { executeQuery } from "@/lib/fetch-contents";
-import { ResultOf, graphql, readFragment } from "@/lib/graphql";
+import { graphql } from "@/lib/graphql";
 
 import { Content, readContentFragment } from "@/fragments/content";
 import { ResponsiveImage } from "@/fragments/responsive-image";
