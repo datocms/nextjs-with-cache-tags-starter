@@ -18,9 +18,15 @@ export type CacheTag = string & { readonly _: unique symbol };
  * an array of string properly typed: `['tag-a', 'tag-2', 'other-tag']`.
  */
 export function parseSpaceSeparatedTagString(
-  string: undefined | null | string,
+  string: undefined | null | string
 ) {
   if (!string) return [];
 
-  return (string.split(" ") || []) as CacheTag[];
+  return (string.split(" ") || []).map((tag) => of(tag));
+}
+
+export function of(string: undefined | null | string) {
+  if (!string) throw new Error("CacheTag.of() requires a non-null string");
+
+  return string as CacheTag;
 }
