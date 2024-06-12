@@ -12,6 +12,37 @@ export async function executeQuery<
   Result = unknown,
   Variables = Record<string, unknown>
 >(query: TadaDocumentNode<Result, Variables>, variables?: Variables) {
+  const BATCH_SIZE = 64;
+
+  /**
+   * Prepare the fetcher functions we're gonna use below.
+   */
+  function fetchFromDatoCMS(tags: CacheTag[]) {
+    return fetch("https://graphql.datocms.com/", {
+      method: "POST",
+      // Headers are used to instruct DatoCMS on how to treat the request:
+      headers: {
+        // - No token, no party: only authorized requests return data
+        Authorization: `Bearer ${process.env.PUBLIC_DATOCMS_API_TOKEN}`,
+        // - Only return valid record
+        "X-Exclude-Invalid": "true",
+        // - Finally, return the cache tags together with the content.
+        "X-Cache-Tags": "true",
+      },
+      body: JSON.stringify({ query: print(query), variables }),
+
+      // Next uses some default for caching, but we explicite them all:
+      // - we want Next.js to cache the request, even if POST requests are usually
+      //   not cached.
+      cache: "force-cache",
+      next: {
+        // - we mark the request with the cache tags returned by DatoCMS, so that
+        //   we'll be able to invalidate any of them later.
+        tags,
+      },
+    });
+  }
+
   if (!query) {
     throw new Error(`Query is not valid`);
   }
@@ -19,7 +50,7 @@ export async function executeQuery<
   /**
    * Executes a GraphQL query on DatoCMS API.
    */
-  const response = await fetchFromDatoCMS(query, variables, []);
+  const response = await fetchFromDatoCMS([]);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${JSON.stringify(response)}`);
@@ -62,7 +93,7 @@ export async function executeQuery<
   for (let position = 0; position < cacheTags.length; position += BATCH_SIZE) {
     const batch = cacheTags.slice(position, position + BATCH_SIZE);
 
-    await fetchFromDatoCMS(query, variables, batch);
+    await fetchFromDatoCMS(batch);
   }
 
   /**
@@ -70,39 +101,4 @@ export async function executeQuery<
    * real-world application this is probably not needed.
    */
   return { data, cacheTags };
-}
-
-const BATCH_SIZE = 64;
-
-async function fetchFromDatoCMS<
-  Result = unknown,
-  Variables = Record<string, unknown>
->(
-  query: TadaDocumentNode<Result, Variables>,
-  variables: Variables | undefined = undefined,
-  tags: CacheTag[]
-) {
-  return fetch("https://graphql.datocms.com/", {
-    method: "POST",
-    // Headers are used to instruct DatoCMS on how to treat the request:
-    headers: {
-      // - No token, no party: only authorized requests return data
-      Authorization: `Bearer ${process.env.PUBLIC_DATOCMS_API_TOKEN}`,
-      // - Only return valid record
-      "X-Exclude-Invalid": "true",
-      // - Finally, return the cache tags together with the content.
-      "X-Cache-Tags": "true",
-    },
-    body: JSON.stringify({ query: print(query), variables }),
-
-    // Next uses some default for caching, but we explicite them all:
-    // - we want Next.js to cache the request, even if POST requests are usually
-    //   not cached.
-    cache: "force-cache",
-    next: {
-      // - we mark the request with the cache tags returned by DatoCMS, so that
-      //   we'll be able to invalidate any of them later.
-      tags,
-    },
-  });
 }
