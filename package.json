@@ -11,6 +11,7 @@
     "prepare": "npm run generate-schema"
   },
   "dependencies": {
+    "@datocms/cma-client-node": "^3.3.2",
     "gql.tada": "^1.7.5",
     "next": "14.2.3",
     "react": "^18",
@@ -18,11 +19,11 @@
     "react-dom": "^18"
   },
   "devDependencies": {
-    "dotenv-cli": "^7.4.2",
     "@0no-co/graphqlsp": "^1.12.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "eslint-config-prettier": "^9.1.0",
