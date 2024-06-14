@@ -34,7 +34,7 @@ export async function executeQuery<
       // Next uses some default for caching, but we explicite them all:
       // - we want Next.js to cache the request, even if POST requests are usually
       //   not cached.
-      cache: "force-cache",
+      ...(process.env.NETLIFY === "true" ? {} : { cache: "force-cache" }),
       next: {
         // - we mark the request with the cache tags returned by DatoCMS, so that
         //   we'll be able to invalidate any of them later.
