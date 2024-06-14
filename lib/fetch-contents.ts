@@ -28,6 +28,14 @@ export async function executeQuery<
         "X-Exclude-Invalid": "true",
         // - Finally, return the cache tags together with the content.
         "X-Cache-Tags": "true",
+
+        ...(process.env.NETLIFY === "true"
+          ? {
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+              Expires: "0",
+            }
+          : {}),
       },
       body: JSON.stringify({ query: print(query), variables }),
 
