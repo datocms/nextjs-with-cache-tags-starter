@@ -28,25 +28,13 @@ export async function executeQuery<
         "X-Exclude-Invalid": "true",
         // - Finally, return the cache tags together with the content.
         "X-Cache-Tags": "true",
-
-        ...(process.env.NETLIFY === "true"
-          ? {
-              "Cache-Control": "no-cache, no-store, must-revalidate",
-              Pragma: "no-cache",
-              Expires: "0",
-            }
-          : {}),
       },
       body: JSON.stringify({ query: print(query), variables }),
 
       // Next uses some default for caching, but we explicite them all: we want
       // Next.js to cache the request, even if POST requests are usually not
-      // cached (not on Netlify, though, where the data cache seems to behave
-      // in a stale-while-revalidate manner).
-      ...(process.env.NETLIFY === "true"
-        ? { revalidate: 0 }
-        : { cache: "force-cache" }),
-
+      // cached.
+      cache: "force-cache",
       next: {
         // - we mark the request with the cache tags returned by DatoCMS, so that
         //   we'll be able to invalidate any of them later.
