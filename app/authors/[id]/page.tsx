@@ -54,6 +54,7 @@ async function Page({ params }: Props) {
               ", "
             )}"`}
             data-placement="bottom"
+            data-flexible-content
           >
             {author.name}
           </span>

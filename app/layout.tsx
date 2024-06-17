@@ -65,6 +65,7 @@ export default async function RootLayout({
                       ", "
                     )}"`}
                     data-placement="bottom"
+                    data-flexible-content
                   >
                     Most recent post
                   </Link>
@@ -79,9 +80,9 @@ export default async function RootLayout({
           <p>
             This page has been generated on{" "}
             <span
-              data-tooltip="This date is injected when the page is built: it won't change anymore, until some of the content changes and all the page is invalidated and, therefore, rebuilt at the first request."
-              data-placement="top
-              "
+              data-tooltip="This date is injected when the page is built: it won't change anymore, until some of the content changes and all the page is invalidated and, therefore, it will be rebuilt at the first request."
+              data-placement="top"
+              data-flexible-content
             >
               {new Date().toISOString()}
             </span>

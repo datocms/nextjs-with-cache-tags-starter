@@ -109,6 +109,7 @@ async function Page({ params }: Props) {
               ", "
             )}"`}
             data-placement="bottom"
+            data-flexible-content
           >
             {currentPost.title}
           </span>
@@ -148,6 +149,7 @@ async function Page({ params }: Props) {
             ", "
           )}"`}
           data-placement="bottom"
+          data-flexible-content
         >
           Siblings posts
         </span>
