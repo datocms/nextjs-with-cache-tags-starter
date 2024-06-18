@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-schema": "dotenv -c -- bash -c 'gql-tada generate-schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $PUBLIC_DATOCMS_API_TOKEN\"'",
+    "generate-schema": "dotenv -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $PUBLIC_DATOCMS_API_TOKEN\"'",
     "prepare": "npm run generate-schema"
   },
   "dependencies": {
