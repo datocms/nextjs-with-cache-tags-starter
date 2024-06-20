@@ -1,32 +1,33 @@
 /**
  * The purpose of this type alias is to create a [branded type][bt]: by
- * intersecting string with `{ readonly _: unique symbol }`, we can create a type
- * that is distinguishable from plain strings even though it is still
+ * intersecting string with `{ readonly _: unique symbol }`, we can create a
+ * type that is distinguishable from plain strings even though it is still
  * fundamentally a string.
  *
  * [bt]: https://egghead.io/blog/using-branded-types-in-typescript
  *
- * Even though CacheTag is technically a string, it is treated as a distinct
+ * Even though `CacheTag` is technically a string, it is treated as a distinct
  * type because of the unique symbol. This pattern is used to add a layer of
  * type safety, ensuring that only values explicitly marked as `CacheTag` can be
  * used where a `CacheTag` is expected.
  */
 export type CacheTag = string & { readonly _: unique symbol };
 
+/* Converts a generic string into a `CacheTag` */
+export function toCacheTag(string: undefined | null | string) {
+  if (!string) throw new Error('toCacheTag() requires a non-null string');
+
+  return string as CacheTag;
+}
+
 /**
- * Converts a string like `"tag-a tag-2 other-tag"` into
- * an array of string properly typed: `['tag-a', 'tag-2', 'other-tag']`.
+ * Converts the value of DatoCMS's `X-Cache-Tags` header into an array of string
+ * properly typed as `CacheTag`: `['tag-a', 'tag-2', 'other-tag']`.
  */
-export function parseSpaceSeparatedTagString(
-  string: undefined | null | string
+export function parseXCacheTagsResponseHeader(
+  string: undefined | null | string,
 ) {
   if (!string) return [];
 
-  return (string.split(" ") || []).map((tag) => of(tag));
-}
-
-export function of(string: undefined | null | string) {
-  if (!string) throw new Error("CacheTag.of() requires a non-null string");
-
-  return string as CacheTag;
+  return (string.split(' ') || []).map((tag) => toCacheTag(tag));
 }

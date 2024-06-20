@@ -1,7 +1,7 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { executeQuery } from "@/lib/fetch-contents";
-import { graphql } from "@/lib/graphql";
+import { executeQuery } from '@/lib/fetch-content';
+import { graphql } from '@/lib/graphql';
 
 const RECENT_POSTS_QUERY = graphql(`
   query RecentPosts {
@@ -14,7 +14,7 @@ const RECENT_POSTS_QUERY = graphql(`
   }
 `);
 
-export const dynamic = "error";
+export const dynamic = 'force-static';
 
 export default async function Home() {
   const { data, cacheTags } = await executeQuery(RECENT_POSTS_QUERY);

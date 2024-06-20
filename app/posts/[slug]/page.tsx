@@ -1,14 +1,14 @@
-import Link from "next/link";
-import React from "react";
-import { StructuredText } from "react-datocms";
+import Link from 'next/link';
+import React from 'react';
+import { StructuredText } from 'react-datocms';
 
-import { executeQuery } from "@/lib/fetch-contents";
-import { graphql } from "@/lib/graphql";
+import { executeQuery } from '@/lib/fetch-content';
+import { graphql } from '@/lib/graphql';
 
-import { Content, readContentFragment } from "@/fragments/content";
-import { ResponsiveImage } from "@/fragments/responsive-image";
+import { Content, readContentFragment } from '@/fragments/content';
+import { ResponsiveImage } from '@/fragments/responsive-image';
 
-import ContentImage from "@/components/ResponsiveImage";
+import ContentImage from '@/components/ResponsiveImage';
 
 const CURRENT_POST_QUERY = graphql(
   `
@@ -33,7 +33,7 @@ const CURRENT_POST_QUERY = graphql(
       }
     }
   `,
-  [Content, ResponsiveImage]
+  [Content, ResponsiveImage],
 );
 
 const PREVIOUS_AND_NEXT_POSTS_QUERY = graphql(`
@@ -64,7 +64,7 @@ const PREVIOUS_AND_NEXT_POSTS_QUERY = graphql(`
   }
 `);
 
-export const dynamic = "error";
+export const dynamic = 'force-static';
 
 type Props = {
   params: { slug: string };
@@ -106,7 +106,7 @@ async function Page({ params }: Props) {
         <h1>
           <span
             data-tooltip={`The content of this page is generated with a GraphQL query that also returned these cache tags: "${currentPostTags.join(
-              ", "
+              ', ',
             )}"`}
             data-placement="bottom"
             data-flexible-content
@@ -121,7 +121,7 @@ async function Page({ params }: Props) {
           data={readContentFragment(currentPost.content)}
           renderBlock={({ record }) => {
             switch (record.__typename) {
-              case "ImageBlockRecord":
+              case 'ImageBlockRecord':
                 return record.image?.responsiveImage ? (
                   <ContentImage
                     responsiveImage={record.image.responsiveImage}
@@ -136,7 +136,7 @@ async function Page({ params }: Props) {
 
       {currentPost.author && (
         <p>
-          Written by{" "}
+          Written by{' '}
           <Link href={`/authors/${currentPost.author.id}`} role="button">
             {currentPost.author.name}
           </Link>
@@ -146,7 +146,7 @@ async function Page({ params }: Props) {
       <h2>
         <span
           data-tooltip={`The content of this section is generated with a GraphQL query that also returned these cache tags: "${previousAndNextPostsTags.join(
-            ", "
+            ', ',
           )}"`}
           data-placement="bottom"
           data-flexible-content
@@ -157,21 +157,21 @@ async function Page({ params }: Props) {
 
       <div className="grid">
         <div>
-          Previous:{" "}
+          Previous:{' '}
           {previousPost ? (
             <Link href={`/posts/${previousPost.slug}`}>
               {previousPost.title}
             </Link>
           ) : (
-            "—"
+            '—'
           )}
         </div>
         <div>
-          Next:{" "}
+          Next:{' '}
           {nextPost ? (
             <Link href={`/posts/${nextPost.slug}`}>{nextPost.title}</Link>
           ) : (
-            "—"
+            '—'
           )}
         </div>
       </div>

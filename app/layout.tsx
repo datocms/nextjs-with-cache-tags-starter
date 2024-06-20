@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
-import "./globals.css";
+import './globals.css';
 
-import { executeQuery } from "@/lib/fetch-contents";
-import { graphql } from "@/lib/graphql";
+import { executeQuery } from '@/lib/fetch-content';
+import { graphql } from '@/lib/graphql';
 
 type LastPostData = {
   lastPost: {
@@ -21,11 +21,11 @@ const LAST_POST_QUERY = graphql(`
   }
 `);
 
-export const dynamic = "error";
+export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: "DatoCMS starter: a blog example",
-  description: "Featuring DatoCMS React components, cache tags and more",
+  title: 'DatoCMS starter: a blog example',
+  description: 'Featuring DatoCMS React components, cache tags and more',
 };
 
 export default async function RootLayout({
@@ -62,7 +62,7 @@ export default async function RootLayout({
                   <Link
                     href={`/posts/${lastPost.slug}`}
                     data-tooltip={`This link is generated with a GraphQL query that also returned these cache tags: "${cacheTags.join(
-                      ", "
+                      ', ',
                     )}"`}
                     data-placement="bottom"
                     data-flexible-content
@@ -78,7 +78,7 @@ export default async function RootLayout({
         <footer className="container">
           <hr />
           <p>
-            This page has been generated on{" "}
+            This page has been generated on{' '}
             <span
               data-tooltip="This date is injected when the page is built: it won't change anymore, until some of the content changes and all the page is invalidated and, therefore, it will be rebuilt at the first request."
               data-placement="top"

@@ -1,6 +1,6 @@
-import { FragmentOf, graphql, readFragment } from "@/lib/graphql";
+import { type FragmentOf, graphql, readFragment } from '@/lib/graphql';
 
-import { ResponsiveImage } from "./responsive-image";
+import { ResponsiveImage } from './responsive-image';
 
 export const Content = graphql(
   `
@@ -21,7 +21,7 @@ export const Content = graphql(
       }
     }
   `,
-  [ResponsiveImage]
+  [ResponsiveImage],
 );
 
 export const readContentFragment = (content: FragmentOf<typeof Content>) => {

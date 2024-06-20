@@ -10,13 +10,39 @@ Everything you need to know to build a Next.js project powered by DatoCMS.
 
 ## Featuring
 
-- [Fetching contents](lib/fetch-contents.ts) from DatoCMS
-- Using [cache tags](lib/cache-tags.ts)
-- Using [DatoCMS components](https://github.com/datocms/react-datocms)
+- [Fetching content](lib/fetch-content.ts) from DatoCMS
+- Using [DatoCMS Cache Tags](lib/cache-tags.ts)
+- Using [DatoCMS React components](https://github.com/datocms/react-datocms)
 
 ## Getting Started
 
-First, run the development server:
+Begin with setting a `PUBLIC_DATOCMS_API_TOKEN` in `.env.local`.
+You can use `.env.local.example` as a starting point and retrieve the token from
+your DatoCMS project.
+
+Then create an account on Turso (unless you already have one) and
+authenticate like explained in the [quickstart
+documentation](https://docs.turso.tech/quickstart). Stop following the 
+tutorial before creating any database: that will be one of the next steps.
+
+Then run `npm install` (or the equivalent command for your package manager of choice).
+Now the DatoCMS GraphQL schema has been downloaded.
+
+Now you must create a Turso database: run `npm run setup-database` and, in a few
+seconds, you will see the new database appearing on the [Turso
+dashboard](https://turso.tech/app/databases).
+
+Retrieve the database URL and create a database token with the following commands:
+
+```bash
+turso db show nextjs-with-cache-tags
+turso db tokens create nextjs-with-cache-tags
+```
+
+Finally copy paste the URL and the token in your `.env.local` file for
+`TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` env variables.
+
+Now you can run the development server:
 
 ```bash
 npm run dev

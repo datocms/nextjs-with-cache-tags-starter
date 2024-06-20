@@ -1,4 +1,4 @@
-import { graphql } from "@/lib/graphql";
+import { graphql } from '@/lib/graphql';
 
 export const ResponsiveImage = graphql(`
   fragment ResponsiveImage on ResponsiveImage {

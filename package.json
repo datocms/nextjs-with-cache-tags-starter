@@ -1,5 +1,5 @@
 {
-  "name": "nextjs-starter",
+  "name": "nextjs-with-cache-tags",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,11 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "setup-database": "turso db list | grep -q 'nextjs-with-cache-tags' || turso db create nextjs-with-cache-tags --from-dump ./schema.sql",
     "generate-schema": "dotenv -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $PUBLIC_DATOCMS_API_TOKEN\"'",
+    "format": "biome check . --write --unsafe --diagnostic-level=error && biome format --diagnostic-level=error --write .",
     "prepare": "npm run generate-schema"
   },
   "dependencies": {
     "@datocms/cma-client-node": "^3.3.2",
+    "@libsql/client": "^0.6.2",
     "@netlify/plugin-nextjs": "^5.3.3-canary-no-cache-fix.0",
     "gql.tada": "^1.7.5",
     "next": "14.2.3",
@@ -21,6 +24,7 @@
   },
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.12.5",
+    "@biomejs/biome": "1.8.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

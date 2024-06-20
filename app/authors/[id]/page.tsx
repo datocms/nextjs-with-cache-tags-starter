@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 
-import { executeQuery } from "@/lib/fetch-contents";
-import { graphql } from "@/lib/graphql";
-import { ResponsiveImage } from "@/fragments/responsive-image";
-import ContentImage from "@/components/ResponsiveImage";
+import ContentImage from '@/components/ResponsiveImage';
+import { ResponsiveImage } from '@/fragments/responsive-image';
+import { executeQuery } from '@/lib/fetch-content';
+import { graphql } from '@/lib/graphql';
 
 const AUTHOR_QUERY = graphql(
   `
@@ -20,10 +20,10 @@ const AUTHOR_QUERY = graphql(
       }
     }
   `,
-  [ResponsiveImage]
+  [ResponsiveImage],
 );
 
-export const dynamic = "error";
+export const dynamic = 'force-static';
 
 type Props = {
   params: { id: string };
@@ -35,7 +35,7 @@ async function Page({ params }: Props) {
 
   const { data: authorData, cacheTags: authorTags } = await executeQuery(
     AUTHOR_QUERY,
-    { id }
+    { id },
   );
 
   const { author } = authorData;
@@ -51,7 +51,7 @@ async function Page({ params }: Props) {
         <h1>
           <span
             data-tooltip={`The content of this page is generated with a GraphQL query that also returned these cache tags: "${authorTags.join(
-              ", "
+              ', ',
             )}"`}
             data-placement="bottom"
             data-flexible-content
