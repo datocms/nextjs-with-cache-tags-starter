@@ -57,3 +57,7 @@ export async function deleteCacheTagAssociations(queryDigests: string[]) {
     args: queryDigests,
   });
 }
+
+export async function truncateAssociationsTable() {
+  await turso().execute('DELETE FROM query_digest_to_cache_tag_mappings');
+}
