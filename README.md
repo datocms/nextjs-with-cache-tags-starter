@@ -106,7 +106,7 @@ The code essentially consists of two parts that are strongly interdependent:
 
 The [`executeQuery()` function](https://github.com/datocms/nextjs-with-cache-tags-starter/blob/main/lib/fetch-content.ts#L20) is responsible for executing a GraphQL query using the DatoCMS Content Delivery API and caching the result. To support cache invalidation, the request is tagged with a unique identifier in the Next.js Data Cache.
 
-A mapping between the unique identifier of the query, and the DatoCMS Cache Tags returned in the response are stored in a persistent database. We use a [simple table](https://github.com/datocms/nextjs-with-cache-tags-starter/blob/main/schema.sql) made up of just two columns:
+The mapping between the unique identifier of the query, and the DatoCMS Cache Tags returned in the response is stored in Turso. We use a [simple table](https://github.com/datocms/nextjs-with-cache-tags-starter/blob/main/schema.sql) made up of just two columns:
 
 * `query_id` (TEXT): A unique identifier for the query, used to tag the request;
 * `cache_tag` (TEXT): The actual cache tag returned by the query.
