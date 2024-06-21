@@ -1,81 +1,131 @@
 <!--datocms-autoinclude-header start-->
+
 <a href="https://www.datocms.com/"><img src="https://www.datocms.com/images/full_logo.svg" height="60"></a>
 
 👉 [Visit the DatoCMS homepage](https://www.datocms.com) or see [What is DatoCMS?](#what-is-datocms)
+
 <!--datocms-autoinclude-header end-->
 
-# DatoCMS Next.js starter
+# Next.js + DatoCMS Cache Tags
 
-Everything you need to know to build a Next.js project powered by DatoCMS.
+Everything you need to know to build a Next.js project powered by DatoCMS Cache Tags to achieve the perfect balance of performance, efficiency, and real-time updates.
 
-## Featuring
+<img src="https://github.com/datocms/nextjs-with-cache-tags-starter/raw/main/images/browser.png" />
 
-- [Fetching content](lib/fetch-content.ts) from DatoCMS
-- Using [DatoCMS Cache Tags](lib/cache-tags.ts)
-- Using [DatoCMS React components](https://github.com/datocms/react-datocms)
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [Getting Started](#getting-started)
+  - [Step 1: Clone the DatoCMS project](#step-1-clone-the-datocms-project)
+  - [Step 2: Environment variables](#step-2-environment-variables)
+      - [`WEBHOOK_TOKEN`](#webhook_token)
+      - [`PUBLIC_DATOCMS_API_TOKEN`](#public_datocms_api_token)
+      - [`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`](#turso_database_url-turso_auth_token)
+  - [Step 3: Install dependencies and download the DatoCMS GraphQL Schema](#step-3-install-dependencies-and-download-the-datocms-graphql-schema)
+  - [Step 4: Run development server](#step-4-run-development-server)
+- [Deployment](#deployment)
+- [Useful resources to navigate the code](#useful-resources-to-navigate-the-code)
+  - [Execution of GraphQL queries](#execution-of-graphql-queries)
+  - ["Cache Tags Invalidation" webhook](#cache-tags-invalidation-webhook)
 
 ## Getting Started
 
-Begin with setting a `PUBLIC_DATOCMS_API_TOKEN` in `.env.local`.
-You can use `.env.local.example` as a starting point and retrieve the token from
-your DatoCMS project.
+### Step 1: Clone the DatoCMS project
 
-Then create an account on Turso (unless you already have one) and
-authenticate like explained in the [quickstart
-documentation](https://docs.turso.tech/quickstart). Stop following the 
-tutorial before creating any database: that will be one of the next steps.
+Start by pressing this button to create a new project on DatoCMS containing the data expected by this project:
 
-Then run `npm install` (or the equivalent command for your package manager of choice).
-Now the DatoCMS GraphQL schema has been downloaded.
+[![Clone DatoCMS project](https://dashboard.datocms.com/clone/button.svg)](https://dashboard.datocms.com/clone?projectId=23796&name=Next.js+%2B+Cache+Tags)
 
-Now you must create a Turso database: run `npm run setup-database` and, in a few
-seconds, you will see the new database appearing on the [Turso
-dashboard](https://turso.tech/app/databases).
+### Step 2: Environment variables
 
-Retrieve the database URL and create a database token with the following commands:
+Use `.env.local.example` file as a starting point:
 
 ```bash
-turso db show nextjs-with-cache-tags
+cp .env.local.example .env.local
+```
+
+Now open `.env.local` and start populating the variables:
+
+##### `WEBHOOK_TOKEN`
+
+Any secure random string. It will be used to authenticate the webhook requests that come from DatoCMS.
+
+##### `PUBLIC_DATOCMS_API_TOKEN`
+
+An API token from the DatoCMS project you just created. [Learn to create an API token](https://www.datocms.com/docs/content-delivery-api/authentication).
+
+##### `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`
+
+Follow the first two steps of the [Turso Quickstart
+](https://docs.turso.tech/quickstart) ("Install the Turso CLI" and "Signup to Turso"), then create a new database by running `npm run setup-database`. In a few seconds, the new database should appear on the [Turso dashboard](https://turso.tech/app/databases).
+
+You can then retrieve the database URL and create a database token with the following commands:
+
+```bash
+# Fill in TURSO_DATABASE_URL with:
+turso db show nextjs-with-cache-tags --url
+
+# Fill in TURSO_AUTH_TOKEN with:
 turso db tokens create nextjs-with-cache-tags
 ```
 
-Finally copy paste the URL and the token in your `.env.local` file for
-`TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` env variables.
+### Step 3: Install dependencies and download the DatoCMS GraphQL Schema
+
+Simply run `npm install` (or the equivalent command for your package manager of choice): a `schema.graphql` will be generated.
+
+### Step 4: Run development server
 
 Now you can run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-## Learn More
+The project works well on both Vercel and Netlify. Just make sure to set the environment variables as previously described.
 
-To learn more about Next.js, take a look at the following resources:
+**Important:** Once the site is deployed and you know the final domain, you need to set up a ["Invalidate cache tag" webhook](https://www.datocms.com/docs/content-delivery-api/cache-tags#step-3-implement-the-invalidate-cache-tag-webhook) on your DatoCMS project, configured like this:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+<img src="https://github.com/datocms/nextjs-with-cache-tags-starter/raw/main/images/webhook.png" width="500" />
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Useful resources to navigate the code
 
-## Deploy on Vercel
+This repository aims to demonstrate how you can selectively invalidate the Next.js cache when receiving DatoCMS Cache Tags invalidation events. Before exploring this repository, it's very useful to understand the general concepts behind Cache Tags:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- DatoCMS Cache Tags: [Announcement](https://www.datocms.com/blog/introducing-datocms-cache-tags), [Documentation](https://www.datocms.com/docs/content-delivery-api/cache-tags)
+- Cache Tags with Next.js: [Guide](https://www.datocms.com/docs/next-js/using-cache-tags)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The code essentially consists of two parts that are strongly interdependent:
+
+### Execution of GraphQL queries
+
+The [`executeQuery()` function](https://github.com/datocms/nextjs-with-cache-tags-starter/blob/main/lib/fetch-content.ts#L20) is responsible for executing a GraphQL query using the DatoCMS Content Delivery API and caching the result. To support cache invalidation, the request is tagged with a unique identifier in the Next.js Data Cache.
+
+A mapping between the unique identifier of the query, and the DatoCMS Cache Tags returned in the response are stored in a persistent database. We use a [simple table](https://github.com/datocms/nextjs-with-cache-tags-starter/blob/main/schema.sql) made up of just two columns:
+
+* `query_id` (TEXT): A unique identifier for the query, used to tag the request;
+* `cache_tag` (TEXT): The actual cache tag returned by the query.
+
+We selected Turso because it's an incredibly cost-effective solution and is compatible with any hosting service. However, any other storage solution would be just as effective due to the simplicity of the saved data. You can switch the storage option by adjusting the code in [`lib/database.ts`](https://github.com/datocms/nextjs-with-cache-tags-starter/blob/main/lib/database.ts).
+
+### "Cache Tags Invalidation" webhook
+
+The [route handler `/api/invalidate-cache-tags`](https://github.com/datocms/nextjs-with-cache-tags-starter/blob/main/app/api/invalidate-cache-tags/route.ts) receives ["Cache Tag Invalidation" events from a DatoCMS webhook](https://www.datocms.com/docs/content-delivery-api/cache-tags#step-3-implement-the-invalidate-cache-tag-webhook) and is responsible for invalidating every cached GraphQL query that is linked to those tags.
+
+Since the `executeQuery()`:
+
+- Tags each GraphQL request with a unique ID in the Next.js Data Cache, and
+- Saves the "Query ID <-> Cache Tags" mapping on a Turso database.
+
+The endpoint can query the database to find the query IDs associated with the received tags, and use `revalidateTag()` to invalidate the relevant requests.
 
 <!--datocms-autoinclude-footer start-->
------------------
+
 # What is DatoCMS?
+
 <a href="https://www.datocms.com/"><img src="https://www.datocms.com/images/full_logo.svg" height="60"></a>
 
 [DatoCMS](https://www.datocms.com/) is the REST & GraphQL Headless CMS for the modern web.
@@ -90,6 +140,7 @@ Trusted by over 25,000 enterprise businesses, agency partners, and individuals a
 - 🆕 Stay up to date on new features and fixes on the [changelog](https://www.datocms.com/product-updates)
 
 **Our featured repos:**
+
 - [datocms/react-datocms](https://github.com/datocms/react-datocms): React helper components for images, Structured Text rendering, and more
 - [datocms/js-rest-api-clients](https://github.com/datocms/js-rest-api-clients): Node and browser JavaScript clients for updating and administering your content. For frontend fetches, we recommend using our [GraphQL Content Delivery API](https://www.datocms.com/docs/content-delivery-api) instead.
 - [datocms/cli](https://github.com/datocms/cli): Command-line interface that includes our [Contentful importer](https://github.com/datocms/cli/tree/main/packages/cli-plugin-contentful) and [Wordpress importer](https://github.com/datocms/cli/tree/main/packages/cli-plugin-wordpress)
@@ -98,4 +149,5 @@ Trusted by over 25,000 enterprise businesses, agency partners, and individuals a
 - Frontend examples in different frameworks: [Next.js](https://github.com/datocms/nextjs-demo), [Vue](https://github.com/datocms/vue-datocms) and [Nuxt](https://github.com/datocms/nuxtjs-demo), [Svelte](https://github.com/datocms/datocms-svelte) and [SvelteKit](https://github.com/datocms/sveltekit-demo), [Astro](https://github.com/datocms/datocms-astro-blog-demo), [Remix](https://github.com/datocms/remix-example). See [all our starter templates](https://www.datocms.com/marketplace/starters).
 
 Or see [all our public repos](https://github.com/orgs/datocms/repositories?q=&type=public&language=&sort=stargazers)
+
 <!--datocms-autoinclude-footer end-->

@@ -1,10 +1,23 @@
+/*
+ * This route handler receives "Cache Tag Invalidation" events from a DatoCMS
+ * webhook, and is responsible for invalidating every cached GraphQL query that
+ * is linked to those tags.
+ *
+ * This is possible because `executeQuery()` in lib/fetch-content.ts does two
+ * things:
+ *
+ * - It tags each GraphQL request with a unique ID in the Next.js Data Cache
+ * - It saves the mapping "Query ID <-> Cache Tags" on a Turso database
+ *
+ * So, we just need to query the DB to find the query IDs related to the
+ * received tags, and use `revalidateTag()` to invalidate the relevant requests.
+ *
+ * Read more: https://www.datocms.com/docs/content-delivery-api/cache-tags#step-3-implement-the-invalidate-cache-tag-webhook
+ */
 import { NextResponse } from 'next/server';
 
 import type { CacheTag } from '@/lib/cache-tags';
-import {
-  deleteCacheTagAssociations,
-  retrieveQueryDigestsByCacheTags,
-} from '@/lib/database';
+import { deleteQueries, queriesReferencingCacheTags } from '@/lib/database';
 import { revalidateTag } from 'next/cache';
 
 export const dynamic = 'force-dynamic'; // defaults to auto
@@ -27,7 +40,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          'This endpoint requires an "Webhook-Token" header with a secret token.',
+          'You need to provide a secret token in the `Webhook-Token` header for this endpoint.',
       },
       { status: 401 },
     );
@@ -37,17 +50,11 @@ export async function POST(request: Request) {
 
   const cacheTags = data.entity.attributes.tags;
 
-  const queryDigests = await retrieveQueryDigestsByCacheTags(cacheTags);
+  const queryIds = await queriesReferencingCacheTags(cacheTags);
 
-  await deleteCacheTagAssociations(queryDigests);
+  await deleteQueries(queryIds);
 
-  invalidatePagesByQueryDigest(queryDigests);
-
-  return NextResponse.json({ cacheTags, queryDigests });
-}
-
-function invalidatePagesByQueryDigest(queryDigests: string[]) {
-  for (const queryDigest of queryDigests) {
+  for (const queryId of queryIds) {
     /**
      * The `revalidateTag()` function provided by Next.js actually performs a
      * cache invalidation: this means that the cache entries previously
@@ -57,6 +64,7 @@ function invalidatePagesByQueryDigest(queryDigests: string[]) {
      * The next time someone requests any of these outdated entries, the cache
      * will respond with a MISS.
      */
-    revalidateTag(queryDigest);
+    revalidateTag(queryId);
   }
+  return NextResponse.json({ cacheTags, queryIds });
 }

@@ -6,13 +6,6 @@ import './globals.css';
 import { executeQuery } from '@/lib/fetch-content';
 import { graphql } from '@/lib/graphql';
 
-type LastPostData = {
-  lastPost: {
-    slug: string;
-    title: string;
-  };
-};
-
 const LAST_POST_QUERY = graphql(`
   query LastPost {
     lastPost: post(orderBy: _publishedAt_DESC) {

@@ -3,6 +3,9 @@
   "organizeImports": {
     "enabled": true
   },
+  "files": {
+    "ignore": [".next", "lib/graphql-env.d.ts"]
+  },
   "linter": {
     "enabled": true,
     "rules": {

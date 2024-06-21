@@ -1,11 +1,11 @@
-/**
- * We use [gql.tada][t] to have TypeScript automatically generated from the
- * GraphQL schema.
+/*
+ * We use gql.tada to automatically generate TypeScript types from the GraphQL
+ * schema. This module customizes the default behavior of gql.tada to match the
+ * DatoCMS schema of the project.
  *
- * [t]: https://gql-tada.0no.co/
- *
- * This is the file that adapts the default behaviour of gql.data to the DatoCMS
- * schema of the project.
+ * For more information:
+ * - https://gql-tada.0no.co/
+ * - https://www.datocms.com/docs/content-delivery-api/custom-scalar-types
  */
 
 import { initGraphQLTada } from 'gql.tada';
