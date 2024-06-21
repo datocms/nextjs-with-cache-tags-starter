@@ -69,6 +69,8 @@ turso db show nextjs-with-cache-tags --url
 turso db tokens create nextjs-with-cache-tags
 ```
 
+We selected Turso because it's an incredibly cost-effective solution and is compatible with any hosting service. However, any other storage solution would be just as effective due to the simplicity of the saved data. 
+
 ### Step 3: Install dependencies and download the DatoCMS GraphQL Schema
 
 Simply run `npm install` (or the equivalent command for your package manager of choice): a `schema.graphql` will be generated.
@@ -109,7 +111,7 @@ A mapping between the unique identifier of the query, and the DatoCMS Cache Tags
 * `query_id` (TEXT): A unique identifier for the query, used to tag the request;
 * `cache_tag` (TEXT): The actual cache tag returned by the query.
 
-We selected Turso because it's an incredibly cost-effective solution and is compatible with any hosting service. However, any other storage solution would be just as effective due to the simplicity of the saved data. You can switch the storage option by adjusting the code in [`lib/database.ts`](https://github.com/datocms/nextjs-with-cache-tags-starter/blob/main/lib/database.ts).
+You can switch the storage option from Turso to other options by adjusting the code in [`lib/database.ts`](https://github.com/datocms/nextjs-with-cache-tags-starter/blob/main/lib/database.ts).
 
 ### "Cache Tags Invalidation" webhook
 
@@ -118,9 +120,9 @@ The [route handler `/api/invalidate-cache-tags`](https://github.com/datocms/next
 Since the `executeQuery()`:
 
 - Tags each GraphQL request with a unique ID in the Next.js Data Cache, and
-- Saves the "Query ID <-> Cache Tags" mapping on a Turso database.
+- Saves the "Query ID <-> Cache Tags" mapping on a Turso database...
 
-The endpoint can query the database to find the query IDs associated with the received tags, and use `revalidateTag()` to invalidate the relevant requests.
+The endpoint can find in the database the query IDs associated with the received tags, and use `revalidateTag()` to invalidate the relevant requests.
 
 <!--datocms-autoinclude-footer start-->
 
