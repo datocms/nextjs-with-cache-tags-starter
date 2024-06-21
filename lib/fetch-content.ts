@@ -1,35 +1,20 @@
-import { createHash } from 'node:crypto';
 import type { TadaDocumentNode } from 'gql.tada';
 import { print } from 'graphql';
 
 import { parseXCacheTagsResponseHeader } from './cache-tags';
-import { associateQueryDigestToCacheTags } from './database';
+import { storeQueryCacheTags } from './database';
 
 /*
- * Builds a SHA1 digest of a specific GraphQL query, taking into account both
- * the query itself and its variables.
- */
-function generateQueryDigest<
-  Result = unknown,
-  Variables = Record<string, unknown>,
->(query: TadaDocumentNode<Result, Variables>, variables?: Variables) {
-  const queryDigest = createHash('sha1')
-    .update(print(query))
-    .update(JSON.stringify(variables) || '')
-    .digest('hex');
-
-  return queryDigest;
-}
-
-/**
- * Uses `fetch` to make a request to the DatoCMS GraphQL API. While executing
- * the query, this function also:
+ * Executes a GraphQL query using the DatoCMS Content Delivery API and caches
+ * the result:
  *
- * - Generates a SHA1 digest of the query itself
- * - Stores the `fetch` result in Next.js Data Cache, tagging the cache entry
- *   with the query digest
- * - Stores the association between the query and its related DatoCMS Cache
- *   Tags, so as to later manage the invalidation of the Next cache
+ * To support cache invalidation, the request is tagged with a unique identifier
+ * in the Next.js Data Cache.
+ *
+ * When a "Cache Tags Invalidation" webhook is received from DatoCMS, we need to
+ * identify and invalidate the relevant cached queries. To achieve this, we
+ * store the mapping between the unique identifier and the DatoCMS Cache Tags in
+ * a persistent Turso database for future reference.
  */
 export async function executeQuery<
   Result = unknown,
@@ -39,15 +24,15 @@ export async function executeQuery<
     throw new Error('Query is not valid');
   }
 
-  const queryDigest = generateQueryDigest(query, variables);
+  const queryId = crypto.randomUUID();
 
   const response = await fetch('https://graphql.datocms.com/', {
     method: 'POST',
-    // Headers are used to instruct DatoCMS on how to treat the request:
+    // Headers to instruct DatoCMS on how to process the request:
     headers: {
-      // Provide the API token for the project we wish to run the query in
+      // API token for the project
       Authorization: `Bearer ${process.env.PUBLIC_DATOCMS_API_TOKEN}`,
-      // Only return valid records
+      // Return only valid records
       'X-Exclude-Invalid': 'true',
       // Return the DatoCMS Cache Tags along with the query result
       'X-Cache-Tags': 'true',
@@ -55,7 +40,7 @@ export async function executeQuery<
     body: JSON.stringify({ query: print(query), variables }),
     cache: 'force-cache',
     next: {
-      tags: [queryDigest],
+      tags: [queryId],
     },
   });
 
@@ -77,18 +62,18 @@ export async function executeQuery<
   }
 
   /**
-   * Converts the string of cache tags received via headers into an array of
-   * tags of `CacheTag` type.
+   * Converts the cache tags string from the headers into an array of CacheTag
+   * type.
    */
   const cacheTags = parseXCacheTagsResponseHeader(
     response.headers.get('x-cache-tags'),
   );
 
-  await associateQueryDigestToCacheTags(queryDigest, cacheTags);
+  await storeQueryCacheTags(queryId, cacheTags);
 
   /**
-   * For educational purpose, tags are returned together with the data: in a
-   * real-world application this is probably not needed.
+   * For educational purposes, return tags along with the data. This might not
+   * be needed in a real application.
    */
   return { data, cacheTags };
 }

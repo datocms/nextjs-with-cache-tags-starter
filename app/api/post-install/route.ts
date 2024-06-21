@@ -1,4 +1,10 @@
-import { ApiError, type Client, buildClient } from '@datocms/cma-client-node';
+/*
+ * This route handler is only invoked during the initial deployment of the Starter,
+ * feel free to remove it afterwards! It takes care of creating a new webhook on
+ * DatoCMS that will notify Next.js at every cache tag invalidation event.
+ */
+
+import { ApiError, buildClient, type Client } from '@datocms/cma-client-node';
 import { NextResponse } from 'next/server';
 
 const cors = {
@@ -8,11 +14,6 @@ const cors = {
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   },
 };
-
-/*
-  This endpoint is called right after bootstrapping the Starter project... they
-  can be removed afterwards!
-*/
 
 export async function OPTIONS() {
   return new Response('OK', cors);
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
 async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
   await client.webhooks.create({
     name: '🔄 Invalidate pages using cache tags',
-    url: `${baseUrl}/api/invalidate-pages`,
+    url: `${baseUrl}/api/invalidate-cache-tags`,
     custom_payload: null,
     headers: {
       'Webhook-Token': process.env.WEBHOOK_TOKEN,

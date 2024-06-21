@@ -1,3 +1,8 @@
+/*
+ *  This route handler serves to completely invalidate the project's cache. It
+ *  can be useful to start from a clean slate in case of problems.
+ */
+
 import { truncateAssociationsTable } from '@/lib/database';
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
@@ -9,7 +14,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          'This endpoint requires an "Webhook-Token" header with a secret token.',
+          'You need to provide a secret token in the `Webhook-Token` header for this endpoint.',
       },
       { status: 401 },
     );
