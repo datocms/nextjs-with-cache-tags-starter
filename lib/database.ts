@@ -40,23 +40,29 @@ function sqlPlaceholders(count: number) {
 }
 
 /*
- * Associates DatoCMS Cache Tags to a given GraphQL query. In case of a conflict
- * (e.g. trying to insert a duplicate entry), the operation simply does nothing.
+ * Associates DatoCMS Cache Tags to a given GraphQL query. Within an implicit
+ * transaction, it initially removes any existing tags for the given queryId,
+ * and then adds the new ones. In case of a conflict (e.g. trying to insert a
+ * duplicate entry), the operation simply does nothing.
  */
 export async function storeQueryCacheTags(
   queryId: string,
   cacheTags: CacheTag[],
 ) {
-  const placeholders = cacheTags.map(() => '(?, ?)').join(', ');
-
-  await database().execute({
-    sql: `
-      INSERT INTO query_cache_tags (query_id, cache_tag)
-      VALUES ${placeholders}
-      ON CONFLICT DO NOTHING
-    `,
-    args: cacheTags.flatMap((cacheTag) => [queryId, cacheTag]),
-  });
+  await database().batch([
+    {
+      sql: 'DELETE FROM query_cache_tags WHERE query_id = ?',
+      args: [queryId],
+    },
+    {
+      sql: `
+        INSERT INTO query_cache_tags (query_id, cache_tag)
+        VALUES ${cacheTags.map(() => '(?, ?)').join(', ')}
+        ON CONFLICT DO NOTHING
+      `,
+      args: cacheTags.flatMap((cacheTag) => [queryId, cacheTag]),
+    },
+  ]);
 }
 
 /*

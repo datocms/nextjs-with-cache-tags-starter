@@ -1,0 +1,37 @@
+{
+  "name": "Next with DatoCMS Cache Tags",
+  "description": "A Next.js project powered by DatoCMS Cache Tags",
+  "previewImage": "https://www.datocms-assets.com/205/1719045232-screenshot.png?crop=top&fit=crop&w=600&auto=format",
+  "datocmsProjectId": "23796",
+  "deploymentType": "static",
+  "buildCommand": "npm run build",
+  "environmentVariables": {
+    "PUBLIC_DATOCMS_API_TOKEN": {
+      "type": "datocmsAccessToken",
+      "tokenName": "Bundle-safe, read-only token"
+    },
+    "WEBHOOK_TOKEN": {
+      "type": "string",
+      "value": "secretTokenProtectingWebhookEndpointFromBeingCalledByAnyone"
+    }
+  },
+  "livePreviewUrl": "https://nextjs-with-cache-tags-starter-datocms.vercel.app/",
+  "preDeploy": {
+    "type": "modalWithPostMessage",
+    "intro": {
+      "title": "This starter needs a Turso database!",
+      "description": "Don't worry: we'll create one for you! 😊 All you need to do is log in with your Turso credentials, or register if it's your first time.",
+      "button": "Ok, take me to Turso website"
+    },
+    "modal": {
+      "url": "https://turso-db-creator.vercel.app/",
+      "width": 850,
+      "height": 600
+    }
+  },
+  "postDeploy": {
+    "type": "apiCall",
+    "url": "/api/post-deploy",
+    "description": "Setting up \"Cache Tags Invalidation\" webhook..."
+  }
+}

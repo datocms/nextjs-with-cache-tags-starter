@@ -13,7 +13,7 @@
     "prepare": "npm run generate-schema"
   },
   "dependencies": {
-    "@datocms/cma-client-node": "^3.3.2",
+    "@datocms/cma-client": "^3.3.2",
     "@libsql/client": "^0.6.2",
     "@netlify/plugin-nextjs": "^5.3.3-canary-no-cache-fix.0",
     "gql.tada": "^1.7.5",

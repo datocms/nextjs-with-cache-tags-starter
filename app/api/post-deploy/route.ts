@@ -4,7 +4,7 @@
  * DatoCMS that will notify Next.js at every cache tag invalidation event.
  */
 
-import { ApiError, buildClient, type Client } from '@datocms/cma-client-node';
+import { ApiError, buildClient, type Client } from '@datocms/cma-client';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic'; // defaults to auto
@@ -26,11 +26,7 @@ export async function POST(request: Request) {
 
   const client = buildClient({ apiToken: body.datocmsApiToken });
 
-  const baseUrl = (
-    process.env.VERCEL_BRANCH_URL
-      ? `https://${process.env.VERCEL_BRANCH_URL}`
-      : process.env.URL
-  ) as string;
+  const baseUrl = body.frontendUrl as string;
 
   try {
     await createCacheInvalidationWebhook(client, baseUrl);
@@ -56,7 +52,7 @@ export async function POST(request: Request) {
 async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
   await client.webhooks.create({
     name: '🔄 Invalidate pages using cache tags',
-    url: `${baseUrl}/api/invalidate-cache-tags`,
+    url: new URL('/api/invalidate-cache-tags', baseUrl).toString(),
     custom_payload: null,
     headers: {
       'Webhook-Token': process.env.WEBHOOK_TOKEN,
