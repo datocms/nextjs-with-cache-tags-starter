@@ -49,20 +49,14 @@ export async function storeQueryCacheTags(
   queryId: string,
   cacheTags: CacheTag[],
 ) {
-  await database().batch([
-    {
-      sql: 'DELETE FROM query_cache_tags WHERE query_id = ?',
-      args: [queryId],
-    },
-    {
-      sql: `
-        INSERT INTO query_cache_tags (query_id, cache_tag)
-        VALUES ${cacheTags.map(() => '(?, ?)').join(', ')}
-        ON CONFLICT DO NOTHING
-      `,
-      args: cacheTags.flatMap((cacheTag) => [queryId, cacheTag]),
-    },
-  ]);
+  await database().execute({
+    sql: `
+      INSERT INTO query_cache_tags (query_id, cache_tag)
+      VALUES ${cacheTags.map(() => '(?, ?)').join(', ')}
+      ON CONFLICT DO NOTHING
+    `,
+    args: cacheTags.flatMap((cacheTag) => [queryId, cacheTag]),
+  });
 }
 
 /*
