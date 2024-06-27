@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "setup-database": "turso db list | grep -q 'nextjs-with-cache-tags' || turso db create nextjs-with-cache-tags --from-dump ./schema.sql",
     "generate-schema": "dotenv -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $PUBLIC_DATOCMS_API_TOKEN\"'",
     "format": "biome check . --write --unsafe --diagnostic-level=error && biome format --diagnostic-level=error --write .",
     "prepare": "npm run generate-schema"

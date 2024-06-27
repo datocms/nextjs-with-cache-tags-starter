@@ -56,18 +56,13 @@ An API token from the DatoCMS project you just created. [Learn to create an API 
 
 ##### `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`
 
-Follow the first two steps of the [Turso Quickstart
-](https://docs.turso.tech/quickstart) ("Install the Turso CLI" and "Signup to Turso"), then create a new database by running `npm run setup-database`. In a few seconds, the new database should appear on the [Turso dashboard](https://turso.tech/app/databases).
+Create a database with following button: after signing up or logging in, it's a single click process.
 
-You can then retrieve the database URL and create a database token with the following commands:
+[![Create a database with Turso](https://sqlite.new/button)](https://sqlite.new)
 
-```bash
-# Fill in TURSO_DATABASE_URL with:
-turso db show nextjs-with-cache-tags --url
+Copy the database URL and use it to fill the `TURSO_DATABASE_URL` environment variable.
 
-# Fill in TURSO_AUTH_TOKEN with:
-turso db tokens create nextjs-with-cache-tags
-```
+Also create a token for the database, with no expiration and read/write permissions: copy and use it for the `TURSO_AUTH_TOKEN` variable.
 
 We selected Turso because it's an incredibly cost-effective solution and is compatible with any hosting service. However, any other storage solution would be just as effective due to the simplicity of the saved data. 
 
