@@ -18,8 +18,8 @@ Everything you need to know to build a Next.js project powered by DatoCMS Cache 
 - [Getting Started](#getting-started)
   - [Step 1: Clone the DatoCMS project](#step-1-clone-the-datocms-project)
   - [Step 2: Environment variables](#step-2-environment-variables)
-      - [`WEBHOOK_TOKEN`](#webhook_token)
       - [`PUBLIC_DATOCMS_API_TOKEN`](#public_datocms_api_token)
+      - [`WEBHOOK_TOKEN`](#webhook_token)
       - [`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`](#turso_database_url-turso_auth_token)
   - [Step 3: Install dependencies and download the DatoCMS GraphQL Schema](#step-3-install-dependencies-and-download-the-datocms-graphql-schema)
   - [Step 4: Run development server](#step-4-run-development-server)
@@ -46,25 +46,25 @@ cp .env.local.example .env.local
 
 Now open `.env.local` and start populating the variables:
 
+##### `PUBLIC_DATOCMS_API_TOKEN`
+
+The "GraphQL API Token" from the DatoCMS project you just created. [Learn to find/create an API token](https://www.datocms.com/docs/content-delivery-api/authentication).
+
 ##### `WEBHOOK_TOKEN`
 
 Any secure random string. It will be used to authenticate the webhook requests that come from DatoCMS.
 
-##### `PUBLIC_DATOCMS_API_TOKEN`
-
-An API token from the DatoCMS project you just created. [Learn to create an API token](https://www.datocms.com/docs/content-delivery-api/authentication).
-
 ##### `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`
 
-Create a database with following button: after signing up or logging in, it's a single click process.
+Simply click the following button to create and initialize a Turso database with the expected schema (sign up or log in to Turso is required):
 
-[![Create a database with Turso](https://sqlite.new/button)](https://sqlite.new)
+[![Create a database with Turso](https://sqlite.new/button)](https://sqlite.new?dump=https%3A//raw.githubusercontent.com/datocms/nextjs-with-cache-tags-starter/main/schema.sql)
 
 Copy the database URL and use it to fill the `TURSO_DATABASE_URL` environment variable.
 
 Also create a token for the database, with no expiration and read/write permissions: copy and use it for the `TURSO_AUTH_TOKEN` variable.
 
-We selected Turso because it's an incredibly cost-effective solution and is compatible with any hosting service. However, any other storage solution would be just as effective due to the simplicity of the saved data. 
+We selected Turso because it's an incredibly cost-effective solution and is compatible with any hosting service. However, any other storage solution would be just as effective due to the simplicity of the saved data.
 
 ### Step 3: Install dependencies and download the DatoCMS GraphQL Schema
 
@@ -82,9 +82,17 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Deployment
 
-The project works well on both Vercel and Netlify. Just make sure to set the environment variables as previously described.
+The project runs smoothly on both Vercel and Netlify. Just ensure to set the environment variables as previously explained. For your convenience, you can deploy the project on Vercel using this button:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdatocms%2Fnextjs-with-cache-tags-starter&env=PUBLIC_DATOCMS_API_TOKEN,WEBHOOK_TOKEN,TURSO_DATABASE_URL,TURSO_AUTH_TOKEN&envDescription=Please%20fill%20in%20the%20following%20information&envLink=https%3A%2F%2Fgithub.com%2Fdatocms%2Fnextjs-with-cache-tags-starter%3Ftab%3Dreadme-ov-file%23step-2-environment-variables)
 
 **Important:** Once the site is deployed and you know the final domain, you need to set up a ["Invalidate cache tag" webhook](https://www.datocms.com/docs/content-delivery-api/cache-tags#step-3-implement-the-invalidate-cache-tag-webhook) on your DatoCMS project, configured like this:
+
+* URL: https://`<YOUR-DOMAIN>`/api/invalidate-cache-tags
+* Custom headers: `Webhook-Token: <YOUR_WEBHOOK_TOKEN>`
+* Trigger:
+  * Entity: Content Delivery API Cache Tags
+  * Events: Invalidate
 
 <img src="https://github.com/datocms/nextjs-with-cache-tags-starter/raw/main/images/webhook.png" width="500" />
 

@@ -8,7 +8,7 @@
   "environmentVariables": {
     "PUBLIC_DATOCMS_API_TOKEN": {
       "type": "datocmsAccessToken",
-      "tokenName": "Bundle-safe, read-only token"
+      "tokenName": "GraphQL API Token"
     },
     "WEBHOOK_TOKEN": {
       "type": "string",
