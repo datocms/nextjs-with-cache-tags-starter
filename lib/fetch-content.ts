@@ -38,14 +38,12 @@ async function executeQueryWithoutMemoization<
     excludeInvalid: true,
     returnCacheTags: true,
     variables,
-    fetchFn: (input, init) =>
-      fetch(input, {
-        ...init,
-        cache: 'force-cache',
-        next: {
-          tags: [queryId],
-        },
-      }),
+    requestInitOptions: {
+      cache: 'force-cache',
+      next: {
+        tags: [queryId],
+      },
+    },
   });
 
   /**
