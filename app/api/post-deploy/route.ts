@@ -4,7 +4,7 @@
  * DatoCMS that will notify Next.js at every cache tag invalidation event.
  */
 
-import { ApiError, buildClient, type Client } from '@datocms/cma-client';
+import { ApiError, type Client, buildClient } from '@datocms/cma-client';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic'; // defaults to auto

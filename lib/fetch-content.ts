@@ -1,3 +1,4 @@
+import { rawExecuteQuery } from '@datocms/cda-client';
 import type { TadaDocumentNode } from 'gql.tada';
 import { print } from 'graphql';
 
@@ -32,40 +33,20 @@ async function executeQueryWithoutMemoization<
 
   const queryId = generateQueryId(query, variables);
 
-  const response = await fetch('https://graphql.datocms.com/', {
-    method: 'POST',
-    // Headers to instruct DatoCMS on how to process the request:
-    headers: {
-      // API token for the project
-      Authorization: `Bearer ${process.env.PUBLIC_DATOCMS_API_TOKEN}`,
-      // Return only valid records
-      'X-Exclude-Invalid': 'true',
-      // Return the DatoCMS Cache Tags along with the query result
-      'X-Cache-Tags': 'true',
-    },
-    body: JSON.stringify({ query: print(query), variables }),
-    cache: 'force-cache',
-    next: {
-      tags: [queryId],
-    },
+  const [data, response] = await rawExecuteQuery(query, {
+    token: process.env.PUBLIC_DATOCMS_API_TOKEN!,
+    excludeInvalid: true,
+    returnCacheTags: true,
+    variables,
+    fetchFn: (input, init) =>
+      fetch(input, {
+        ...init,
+        cache: 'force-cache',
+        next: {
+          tags: [queryId],
+        },
+      }),
   });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch data: ${JSON.stringify(response)}`);
-  }
-
-  const { data, errors } = (await response.json()) as {
-    data: Result;
-    errors?: unknown;
-  };
-
-  if (errors) {
-    throw new Error(
-      `Something went wrong while executing the query: ${JSON.stringify(
-        errors,
-      )}`,
-    );
-  }
 
   /**
    * Converts the cache tags string from the headers into an array of CacheTag
