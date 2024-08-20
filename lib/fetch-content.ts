@@ -2,7 +2,8 @@ import { rawExecuteQuery } from '@datocms/cda-client';
 import type { TadaDocumentNode } from 'gql.tada';
 import { print } from 'graphql';
 
-import { createHash } from 'node:crypto';
+// biome-ignore lint/style/useNodejsImportProtocol: https://github.com/datocms/nextjs-with-cache-tags-starter/issues/2
+import { createHash } from 'crypto';
 import { cache } from 'react';
 import { parseXCacheTagsResponseHeader } from './cache-tags';
 import { storeQueryCacheTags } from './database';
