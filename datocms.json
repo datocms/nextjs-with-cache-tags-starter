@@ -16,19 +16,6 @@
     }
   },
   "livePreviewUrl": "https://nextjs-with-cache-tags-starter-datocms.vercel.app/",
-  "preDeploy": {
-    "type": "modalWithPostMessage",
-    "intro": {
-      "title": "This starter needs a Turso database!",
-      "description": "Don't worry: we'll create one for you! 😊 All you need to do is log in with your Turso credentials, or register if it's your first time.",
-      "button": "Ok, take me to Turso website"
-    },
-    "modal": {
-      "url": "https://turso-db-creator.vercel.app/",
-      "width": 850,
-      "height": 600
-    }
-  },
   "postDeploy": {
     "type": "apiCall",
     "url": "/api/post-deploy",
