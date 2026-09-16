@@ -2,9 +2,9 @@
  * Downloads the DatoCMS GraphQL schema into `schema.graphql` so that gql.tada
  * can infer the types of every query in the project.
  *
- * It runs on `npm install` (via the `prepare` script). When no API token is
- * available (e.g. in CI or on a fresh clone), the committed `schema.graphql`
- * is kept as-is and the download is skipped, instead of failing the install.
+ * It runs on `npm install` (via the `prepare` script), and it never fails the
+ * install: the committed `schema.graphql` is the fallback whenever the
+ * download is skipped (CI builds, no API token) or the API call fails.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
@@ -27,9 +27,15 @@ loadDotEnvLocal();
 
 const token = process.env.PUBLIC_DATOCMS_API_TOKEN;
 
-if (!token) {
+const skipReason = process.env.CI
+  ? 'running in CI'
+  : !token
+    ? 'PUBLIC_DATOCMS_API_TOKEN is not set'
+    : null;
+
+if (skipReason) {
   console.log(
-    '[generate-schema] PUBLIC_DATOCMS_API_TOKEN is not set: keeping the existing schema.graphql',
+    `[generate-schema] ${skipReason}: keeping the committed schema.graphql`,
   );
   process.exit(0);
 }
@@ -49,4 +55,9 @@ const result = spawnSync(
   { stdio: 'inherit', shell: process.platform === 'win32' },
 );
 
-process.exit(result.status ?? 1);
+if (result.status !== 0) {
+  console.warn(
+    '[generate-schema] the download failed: keeping the committed schema.graphql',
+  );
+}
+
