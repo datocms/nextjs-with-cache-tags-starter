@@ -1,9 +1,7 @@
+import { createHash } from 'node:crypto';
 import { rawExecuteQuery } from '@datocms/cda-client';
 import type { TadaDocumentNode } from 'gql.tada';
 import { print } from 'graphql';
-
-// biome-ignore lint/style/useNodejsImportProtocol: https://github.com/datocms/nextjs-with-cache-tags-starter/issues/2
-import { createHash } from 'crypto';
 import { cache } from 'react';
 import { parseXCacheTagsResponseHeader } from './cache-tags';
 import { storeQueryCacheTags } from './database';
@@ -15,10 +13,18 @@ import { storeQueryCacheTags } from './database';
  * To support cache invalidation, we use the `next.tags` option to tag the
  * request in the Next.js Data Cache with a unique query identifier.
  *
+ * Why a "Query ID" instead of tagging the request with the DatoCMS Cache Tags
+ * themselves? Because Next.js accepts at most 128 tags per `fetch()` call (each
+ * up to 256 characters), while a single DatoCMS query can easily return more
+ * than that: a list of posts references every post, every author, every asset,
+ * every block... So the request gets exactly ONE tag, the Query ID, and the
+ * "Query ID <-> DatoCMS Cache Tags" mapping is kept out of Next.js.
+ *
  * When a "Cache Tags Invalidation" webhook is received from DatoCMS, we need to
  * identify and invalidate the relevant cached queries. To achieve this, we
  * store the mapping between the unique identifier and the DatoCMS Cache Tags in
- * a persistent Turso database for future reference.
+ * a persistent Turso database for future reference. Read more about the
+ * pattern: https://www.datocms.com/docs/next-js/using-cache-tags
  *
  * 💡 Note: This isn't the final function we're exporting for use in the
  * project! There's one more thing to consider for maximum code optimization.
@@ -36,6 +42,9 @@ async function executeQueryWithoutMemoization<
 
   const [data, response] = await rawExecuteQuery(query, {
     token: process.env.PUBLIC_DATOCMS_API_TOKEN!,
+    // Optional override, used by the E2E test-suite to point the app at a
+    // local mock of the Content Delivery API.
+    graphqlEndpointUrl: process.env.DATOCMS_GRAPHQL_ENDPOINT,
     excludeInvalid: true,
     returnCacheTags: true,
     variables,
@@ -67,6 +76,12 @@ async function executeQueryWithoutMemoization<
 /*
  * Generates a unique identifier for a GraphQL query by building a SHA1 hash
  * of the query itself and its variables.
+ *
+ * The ID must be deterministic (the same query+variables must produce the same
+ * tag on every render, on every server instance, across deployments), because
+ * this is the only link between an entry in the Next.js Data Cache and the rows
+ * stored in the database. A hash also keeps the tag well within the 256
+ * character limit of Next.js, regardless of how long the query is.
  */
 function generateQueryId<Result = unknown, Variables = Record<string, unknown>>(
   query: TadaDocumentNode<Result, Variables>,

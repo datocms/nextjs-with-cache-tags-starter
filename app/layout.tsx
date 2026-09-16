@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import '@picocss/pico/css/pico.min.css';
 import './globals.css';
 
 import { executeQuery } from '@/lib/fetch-content';
@@ -14,6 +15,12 @@ const LAST_POST_QUERY = graphql(`
   }
 `);
 
+/*
+ * Every route that uses `executeQuery()` is marked as `force-static`: the whole
+ * page ends up in the Next.js Full Route Cache, tagged with the same query IDs
+ * as the `fetch()` calls it made, and gets served as pre-rendered HTML (with no
+ * code execution) until one of those tags is invalidated by the webhook.
+ */
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
@@ -32,12 +39,6 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-        />
-      </head>
       <body>
         <header className="container">
           <nav>

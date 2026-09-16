@@ -1,5 +1,4 @@
-import React from 'react';
-
+import { notFound } from 'next/navigation';
 import ContentImage from '@/components/ResponsiveImage';
 import { ResponsiveImage } from '@/fragments/responsive-image';
 import { executeQuery } from '@/lib/fetch-content';
@@ -23,15 +22,15 @@ const AUTHOR_QUERY = graphql(
   [ResponsiveImage],
 );
 
+// See app/layout.tsx: pre-rendered and cached until a cache tag is invalidated.
 export const dynamic = 'force-static';
 
 type Props = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ id: string }>;
 };
 
 async function Page({ params }: Props) {
-  const { id } = params;
+  const { id } = await params;
 
   const { data: authorData, cacheTags: authorTags } = await executeQuery(
     AUTHOR_QUERY,
@@ -40,27 +39,25 @@ async function Page({ params }: Props) {
 
   const { author } = authorData;
 
-  if (!author) return null;
+  if (!author) notFound();
 
   return (
-    <>
-      <article className="grid">
-        {author.picture?.responsiveImage && (
-          <ContentImage responsiveImage={author.picture.responsiveImage} />
-        )}
-        <h1>
-          <span
-            data-tooltip={`The content of this page is generated with a GraphQL query that also returned these cache tags: "${authorTags.join(
-              ', ',
-            )}"`}
-            data-placement="bottom"
-            data-flexible-content
-          >
-            {author.name}
-          </span>
-        </h1>
-      </article>
-    </>
+    <article className="grid">
+      {author.picture?.responsiveImage && (
+        <ContentImage responsiveImage={author.picture.responsiveImage} />
+      )}
+      <h1>
+        <span
+          data-tooltip={`The content of this page is generated with a GraphQL query that also returned these cache tags: "${authorTags.join(
+            ', ',
+          )}"`}
+          data-placement="bottom"
+          data-flexible-content
+        >
+          {author.name}
+        </span>
+      </h1>
+    </article>
   );
 }
 
