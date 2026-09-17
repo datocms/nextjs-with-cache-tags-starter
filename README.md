@@ -25,6 +25,10 @@ Everything you need to know to build a Next.js project powered by DatoCMS Cache 
       - [`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`](#turso_database_url-turso_auth_token)
   - [Step 3: Install dependencies and download the DatoCMS GraphQL Schema](#step-3-install-dependencies-and-download-the-datocms-graphql-schema)
   - [Step 4: Run development server](#step-4-run-development-server)
+- [Testing](#testing)
+  - [Unit tests](#unit-tests)
+  - [End-to-end tests](#end-to-end-tests)
+  - [End-to-end tests against the real project](#end-to-end-tests-against-the-real-project)
 - [Deployment](#deployment)
 - [Useful resources to navigate the code](#useful-resources-to-navigate-the-code)
   - [Execution of GraphQL queries](#execution-of-graphql-queries)
@@ -70,7 +74,7 @@ We selected Turso because it's an incredibly cost-effective solution and is comp
 
 ### Step 3: Install dependencies and download the DatoCMS GraphQL Schema
 
-Simply run `npm install` (or the equivalent command for your package manager of choice): a `schema.graphql` will be generated.
+This project requires Node.js 20.9 or newer (see `.nvmrc`). Simply run `npm install` (or the equivalent command for your package manager of choice): a `schema.graphql` will be generated. If `PUBLIC_DATOCMS_API_TOKEN` is not set (i.e. in CI), the committed `schema.graphql` is kept as-is.
 
 ### Step 4: Run development server
 
@@ -81,6 +85,33 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Testing
+
+### Unit tests
+
+[Vitest](https://vitest.dev/) covers the building blocks in isolation: the cache tags parser, the query ID generation of `executeQuery()`, the Turso data layer (run against a throw-away, file-backed libSQL database) and the three route handlers:
+
+```bash
+npm test
+```
+
+### End-to-end tests
+
+[Playwright](https://playwright.dev/) builds and serves the app in production mode against a local mock of the DatoCMS Content Delivery API (`e2e/mock-cda/`) and a file-backed libSQL database, so no secrets are needed and the suite runs in CI (see `.github/workflows/ci.yml`). Besides checking that every page renders, it exercises the whole cache tags loop: it edits the mocked content, fires the "Cache Tag Invalidation" webhook and verifies that only the affected pages get re-generated.
+
+```bash
+npx playwright install chromium # first time only
+npm run test:e2e
+```
+
+### End-to-end tests against the real project
+
+The same kind of checks can run against the DatoCMS project and Turso database configured in `.env.local`. The invalidation round-trip additionally edits (and restores) the title of a post, which requires a full-access `DATOCMS_CMA_TOKEN` in `.env.local`:
+
+```bash
+npm run test:e2e:live
+```
 
 ## Deployment
 
@@ -127,7 +158,7 @@ Since the `executeQuery()`:
 - Tags each GraphQL request with a unique ID in the Next.js Data Cache, and
 - Saves the "Query ID <-> Cache Tags" mapping on a Turso database...
 
-The endpoint can find in the database the query IDs associated with the received tags, and use `revalidateTag()` to invalidate the relevant requests.
+The endpoint can find in the database the query IDs associated with the received tags, and use `revalidateTag()` to invalidate the relevant requests. Since Next.js 16 the function requires a cache-life profile: the endpoint passes `{ expire: 0 }` so that the entries expire immediately, and the next request to any affected page re-generates it.
 
 <!--datocms-autoinclude-footer start-->
 

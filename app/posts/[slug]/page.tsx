@@ -1,14 +1,11 @@
 import Link from 'next/link';
-import React from 'react';
+import { notFound } from 'next/navigation';
 import { StructuredText } from 'react-datocms';
-
-import { executeQuery } from '@/lib/fetch-content';
-import { graphql } from '@/lib/graphql';
-
+import ContentImage from '@/components/ResponsiveImage';
 import { Content, readContentFragment } from '@/fragments/content';
 import { ResponsiveImage } from '@/fragments/responsive-image';
-
-import ContentImage from '@/components/ResponsiveImage';
+import { executeQuery } from '@/lib/fetch-content';
+import { graphql } from '@/lib/graphql';
 
 const CURRENT_POST_QUERY = graphql(
   `
@@ -64,22 +61,22 @@ const PREVIOUS_AND_NEXT_POSTS_QUERY = graphql(`
   }
 `);
 
+// See app/layout.tsx: pre-rendered and cached until a cache tag is invalidated.
 export const dynamic = 'force-static';
 
 type Props = {
-  params: { slug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ slug: string }>;
 };
 
 async function Page({ params }: Props) {
-  const { slug } = params;
+  const { slug } = await params;
 
   const { data: currentPostData, cacheTags: currentPostTags } =
     await executeQuery(CURRENT_POST_QUERY, { slug });
 
   const { currentPost } = currentPostData;
 
-  if (!currentPost) return null;
+  if (!currentPost) notFound();
 
   const { _firstPublishedAt: firstPublishedAt } = currentPost;
 
