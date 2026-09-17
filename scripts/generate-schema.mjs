@@ -60,4 +60,3 @@ if (result.status !== 0) {
     '[generate-schema] the download failed: keeping the committed schema.graphql',
   );
 }
-
