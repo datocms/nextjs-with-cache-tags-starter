@@ -64,7 +64,7 @@ export async function POST(request: Request) {
      * The next time someone requests any of these outdated entries, the cache
      * will respond with a MISS.
      */
-    revalidateTag(queryId);
+    revalidateTag(queryId, { expire: 0 });
   }
   return NextResponse.json({ cacheTags, queryIds });
 }
