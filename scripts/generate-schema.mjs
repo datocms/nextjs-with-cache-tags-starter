@@ -1,3 +1,11 @@
+/**
+ * Downloads the DatoCMS GraphQL schema into `schema.graphql` so that gql.tada
+ * can infer the types of every query in the project.
+ *
+ * It runs on `npm install` (via the `prepare` script), and it never fails the
+ * install: the committed `schema.graphql` is the fallback whenever the
+ * download is skipped (CI builds, no API token) or the API call fails.
+ */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 
