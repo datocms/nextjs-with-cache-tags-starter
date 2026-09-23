@@ -115,7 +115,7 @@ npm run test:e2e:live
 
 ## Deployment
 
-The project runs smoothly on both Vercel and Netlify. Just ensure to set the environment variables as previously explained. For your convenience, you can deploy the project on Vercel using this button:
+The project runs smoothly on both Vercel and Netlify. Just make sure to set the environment variables as previously explained. For your convenience, you can deploy the project on Vercel using this button:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdatocms%2Fnextjs-with-cache-tags-starter&env=PUBLIC_DATOCMS_API_TOKEN,WEBHOOK_TOKEN,TURSO_DATABASE_URL,TURSO_AUTH_TOKEN&envDescription=Please%20fill%20in%20the%20following%20information&envLink=https%3A%2F%2Fgithub.com%2Fdatocms%2Fnextjs-with-cache-tags-starter%3Ftab%3Dreadme-ov-file%23step-2-environment-variables)
 
