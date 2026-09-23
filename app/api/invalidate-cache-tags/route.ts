@@ -61,10 +61,8 @@ export async function POST(request: Request) {
      * associated with the given tag are immediately marked as outdated (the
      * process is so fast that the method is even synchronous).
      *
-     * Since Next.js 16 a cache-life profile is required: `{ expire: 0 }` makes
-     * the entries expire right away (instead of the stale-while-revalidate
-     * behaviour of the `'max'` profile), so the next time someone requests any
-     * of these outdated entries, the cache will respond with a MISS.
+     * The next time someone requests any of these outdated entries, the cache
+     * will respond with a MISS.
      */
     revalidateTag(queryId, { expire: 0 });
   }
