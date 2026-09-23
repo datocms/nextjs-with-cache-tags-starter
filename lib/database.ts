@@ -3,6 +3,23 @@
  * associations between the GraphQL queries made to the DatoCMS Content Delivery
  * API, and the `Cache-Tags` that these requests return.
  *
+ * Why is a database needed at all? Couldn't the webhook just call
+ * `revalidateTag()` with the DatoCMS tags it receives?
+ *
+ * It could, if the `fetch()` requests were tagged with the DatoCMS Cache Tags.
+ * But Next.js caps the number of tags per request at 128, and a DatoCMS query
+ * can return many more than that (see lib/fetch-content.ts). So each request is
+ * tagged with a single "Query ID" instead, and Next.js has no idea which
+ * DatoCMS tags that entry depends on. The Next.js Data Cache cannot be searched
+ * by tag either: it can only be told "expire everything tagged X".
+ *
+ * Someone therefore has to remember "Query ID <-> DatoCMS Cache Tags", and it
+ * cannot be an in-memory map: the page render (which learns the tags) and the
+ * webhook handler (which needs them, possibly hours later) typically run in
+ * different serverless invocations, on different instances, or even different
+ * deployments. A small, shared, persistent store is the simplest thing that
+ * works: Turso is cheap and reachable from anywhere, but any database would do.
+ *
  * To store these associations, we use a simple table `query_cache_tags`
  * composed of just two columns:
  *
@@ -40,10 +57,12 @@ function sqlPlaceholders(count: number) {
 }
 
 /*
- * Associates DatoCMS Cache Tags to a given GraphQL query. Within an implicit
- * transaction, it initially removes any existing tags for the given queryId,
- * and then adds the new ones. In case of a conflict (e.g. trying to insert a
- * duplicate entry), the operation simply does nothing.
+ * Associates DatoCMS Cache Tags to a given GraphQL query. Rows are only ever
+ * added here: a query is re-executed only after its previous rows have been
+ * removed by the webhook (see app/api/invalidate-cache-tags/route.ts), so the
+ * table never accumulates stale tags. Should the same query be rendered
+ * concurrently, both renders insert the same rows: `ON CONFLICT DO NOTHING`
+ * makes that harmless.
  */
 export async function storeQueryCacheTags(
   queryId: string,
@@ -62,7 +81,9 @@ export async function storeQueryCacheTags(
 }
 
 /*
- * Retrieves the query hashs associated with specified cache tags.
+ * Retrieves the query IDs associated with the specified cache tags: these are
+ * the Next.js tags that need to be revalidated when DatoCMS says that any of
+ * the given tags has changed.
  */
 export async function queriesReferencingCacheTags(
   cacheTags: CacheTag[],
@@ -82,7 +103,10 @@ export async function queriesReferencingCacheTags(
 }
 
 /*
- * Removes all entries that reference the specified queries.
+ * Removes all entries that reference the specified queries. It's called right
+ * before the queries are invalidated: their next execution stores a fresh set
+ * of tags, which may differ from the previous one (e.g. a list of posts that
+ * now includes a different post).
  */
 export async function deleteQueries(queryIds: string[]) {
   if (queryIds.length === 0) return;

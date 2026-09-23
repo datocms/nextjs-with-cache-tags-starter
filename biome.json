@@ -1,15 +1,28 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.8.1/schema.json",
-  "organizeImports": {
-    "enabled": true
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
   "files": {
-    "ignore": [".next", "lib/graphql-env.d.ts"]
+    "includes": [
+      "**",
+      "!**/.next",
+      "!**/lib/graphql-env.d.ts",
+      "!**/schema.graphql",
+      "!**/playwright-report",
+      "!**/test-results",
+      "!**/next-env.d.ts",
+      "!**/public"
+    ]
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "style": {
         "noNonNullAssertion": "warn"
       }

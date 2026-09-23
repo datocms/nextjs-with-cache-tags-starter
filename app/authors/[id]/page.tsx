@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-
 import ContentImage from '@/components/ResponsiveImage';
 import { ResponsiveImage } from '@/fragments/responsive-image';
 import { executeQuery } from '@/lib/fetch-content';
@@ -23,6 +22,7 @@ const AUTHOR_QUERY = graphql(
   [ResponsiveImage],
 );
 
+// See app/layout.tsx: pre-rendered and cached until a cache tag is invalidated.
 export const dynamic = 'force-static';
 
 type Props = {
