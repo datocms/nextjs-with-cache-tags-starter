@@ -70,7 +70,7 @@ We selected Turso because it's an incredibly cost-effective solution and is comp
 
 ### Step 3: Install dependencies and download the DatoCMS GraphQL Schema
 
-Simply run `npm install` (or the equivalent command for your package manager of choice): a `schema.graphql` will be generated.
+This project requires Node.js 20.9 or newer (see `.nvmrc`). Simply run `npm install` (or the equivalent command for your package manager of choice): a `schema.graphql` will be generated. If `PUBLIC_DATOCMS_API_TOKEN` is not set (i.e. in CI), the committed `schema.graphql` is kept as-is.
 
 ### Step 4: Run development server
 
@@ -127,7 +127,7 @@ Since the `executeQuery()`:
 - Tags each GraphQL request with a unique ID in the Next.js Data Cache, and
 - Saves the "Query ID <-> Cache Tags" mapping on a Turso database...
 
-The endpoint can find in the database the query IDs associated with the received tags, and use `revalidateTag()` to invalidate the relevant requests.
+The endpoint can find in the database the query IDs associated with the received tags, and use `revalidateTag()` to invalidate the relevant requests. Since Next.js 16 the function requires a cache-life profile: the endpoint passes `{ expire: 0 }` so that the entries expire immediately, and the next request to any affected page re-generates it.
 
 <!--datocms-autoinclude-footer start-->
 
