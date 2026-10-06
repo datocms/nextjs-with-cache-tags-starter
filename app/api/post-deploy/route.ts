@@ -22,6 +22,18 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
+  const webhookToken = process.env.WEBHOOK_TOKEN;
+
+  if (!webhookToken) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'The `WEBHOOK_TOKEN` environment variable is not set.',
+      },
+      { status: 500, ...cors },
+    );
+  }
+
   const body = await request.json();
 
   const client = buildClient({ apiToken: body.datocmsApiToken });
@@ -29,7 +41,7 @@ export async function POST(request: Request) {
   const baseUrl = body.frontendUrl as string;
 
   try {
-    await createCacheInvalidationWebhook(client, baseUrl);
+    await createCacheInvalidationWebhook(client, baseUrl, webhookToken);
 
     return NextResponse.json({ success: true }, cors);
   } catch (error) {
@@ -49,13 +61,17 @@ export async function POST(request: Request) {
   }
 }
 
-async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
+async function createCacheInvalidationWebhook(
+  client: Client,
+  baseUrl: string,
+  webhookToken: string,
+) {
   await client.webhooks.create({
     name: '🔄 Invalidate pages using cache tags',
     url: new URL('/api/invalidate-cache-tags', baseUrl).toString(),
     custom_payload: null,
     headers: {
-      'Webhook-Token': process.env.WEBHOOK_TOKEN,
+      'Webhook-Token': webhookToken,
     },
     events: [
       {

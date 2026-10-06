@@ -49,6 +49,8 @@ export async function storeQueryCacheTags(
   queryId: string,
   cacheTags: CacheTag[],
 ) {
+  if (cacheTags.length === 0) return;
+
   await database().execute({
     sql: `
       INSERT INTO query_cache_tags (query_id, cache_tag)
@@ -65,6 +67,8 @@ export async function storeQueryCacheTags(
 export async function queriesReferencingCacheTags(
   cacheTags: CacheTag[],
 ): Promise<string[]> {
+  if (cacheTags.length === 0) return [];
+
   const { rows } = await database().execute({
     sql: `
       SELECT DISTINCT query_id
@@ -81,6 +85,8 @@ export async function queriesReferencingCacheTags(
  * Removes all entries that reference the specified queries.
  */
 export async function deleteQueries(queryIds: string[]) {
+  if (queryIds.length === 0) return;
+
   await database().execute({
     sql: `
       DELETE FROM query_cache_tags

@@ -1,37 +1,37 @@
 {
   "name": "nextjs-with-cache-tags",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "generate-schema": "dotenv -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $PUBLIC_DATOCMS_API_TOKEN\"'",
+    "lint": "eslint .",
+    "generate-schema": "node scripts/generate-schema.mjs",
     "format": "biome check . --write --unsafe --diagnostic-level=error && biome format --diagnostic-level=error --write .",
     "prepare": "npm run generate-schema"
   },
   "dependencies": {
-    "@datocms/cda-client": "^0.2.1",
-    "@datocms/cma-client": "^3.3.2",
-    "@libsql/client": "^0.6.2",
-    "@netlify/plugin-nextjs": "^5.3.3-canary-no-cache-fix.0",
-    "gql.tada": "^1.7.5",
-    "next": "14.2.3",
-    "react": "^18",
-    "react-datocms": "^6.0.2",
-    "react-dom": "^18"
+    "@datocms/cda-client": "^0.3.2",
+    "@datocms/cma-client": "^6.3.0",
+    "@libsql/client": "^0.18.0",
+    "@netlify/plugin-nextjs": "^5.15.13",
+    "gql.tada": "^1.11.3",
+    "graphql": "^16.14.2",
+    "next": "16.3.5",
+    "react": "^19.3.0",
+    "react-datocms": "^8.1.2",
+    "react-dom": "^19.3.0"
   },
   "devDependencies": {
-    "@0no-co/graphqlsp": "^1.12.5",
+    "@0no-co/graphqlsp": "^1.17.5",
     "@biomejs/biome": "1.8.1",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/node": "^22.20.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "dotenv-cli": "^7.4.2",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.3",
-    "eslint-config-prettier": "^9.1.0",
-    "typescript": "^5"
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.3.5",
+    "typescript": "^5.9.3"
   }
 }
