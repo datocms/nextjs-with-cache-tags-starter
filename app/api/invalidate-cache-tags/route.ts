@@ -14,11 +14,11 @@
  *
  * Read more: https://www.datocms.com/docs/content-delivery-api/cache-tags#step-3-implement-the-invalidate-cache-tag-webhook
  */
-import { NextResponse } from 'next/server';
 
+import { revalidateTag } from 'next/cache';
+import { NextResponse } from 'next/server';
 import type { CacheTag } from '@/lib/cache-tags';
 import { deleteQueries, queriesReferencingCacheTags } from '@/lib/database';
-import { revalidateTag } from 'next/cache';
 
 export const dynamic = 'force-dynamic'; // defaults to auto
 
@@ -52,6 +52,11 @@ export async function POST(request: Request) {
 
   const queryIds = await queriesReferencingCacheTags(cacheTags);
 
+  /**
+   * Forget the tags of the affected queries BEFORE invalidating them: the next
+   * render will execute them again and store their current tags. Leaving the
+   * old rows around would only cause needless invalidations later on.
+   */
   await deleteQueries(queryIds);
 
   for (const queryId of queryIds) {

@@ -1,5 +1,5 @@
-[data-tooltip][data-placement=bottom][data-flexible-content]::before,
-[data-tooltip][data-placement=top][data-flexible-content]::before {
+[data-tooltip][data-placement="bottom"][data-flexible-content]::before,
+[data-tooltip][data-placement="top"][data-flexible-content]::before {
   width: 20rem;
   white-space: normal;
 }

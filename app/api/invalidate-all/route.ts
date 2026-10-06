@@ -3,9 +3,9 @@
  *  can be useful to start from a clean slate in case of problems.
  */
 
-import { truncateAssociationsTable } from '@/lib/database';
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
+import { truncateAssociationsTable } from '@/lib/database';
 
 export const dynamic = 'force-dynamic'; // defaults to auto
 

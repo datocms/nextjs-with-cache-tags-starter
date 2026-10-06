@@ -14,6 +14,7 @@ const RECENT_POSTS_QUERY = graphql(`
   }
 `);
 
+// See app/layout.tsx: pre-rendered and cached until a cache tag is invalidated.
 export const dynamic = 'force-static';
 
 export default async function Home() {
@@ -29,7 +30,17 @@ export default async function Home() {
             <mark>Homepage</mark>
           </small>
         </p>
-        <h1>Recently published</h1>
+        <h1>
+          <span
+            data-tooltip={`The content of this page is generated with a GraphQL query that also returned these cache tags: "${cacheTags.join(
+              ', ',
+            )}"`}
+            data-placement="bottom"
+            data-flexible-content
+          >
+            Recently published
+          </span>
+        </h1>
         <p>
           This page executes a query to fetch and show the 3 most recent posts.
         </p>

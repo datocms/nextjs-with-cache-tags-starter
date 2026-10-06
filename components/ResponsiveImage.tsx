@@ -1,15 +1,15 @@
+import { SRCImage } from 'react-datocms';
 import { ResponsiveImage } from '@/fragments/responsive-image';
 import { type FragmentOf, readFragment } from '@/lib/graphql';
-import { SRCImage } from 'react-datocms';
 
 type Props = {
   responsiveImage: FragmentOf<typeof ResponsiveImage>;
 };
 
 /**
- * `SRCImage` ships zero client-side JS. The client-side `Image` would pull the
- * whole `react-datocms` bundle (including the optional Mux player) into the
- * client build.
+ * Renders a DatoCMS `responsiveImage` as a plain `<picture>` element.
+ * `SRCImage` ships zero client-side JS, so it can be used directly from Server
+ * Components.
  */
 export default function ContentImage({ responsiveImage }: Props) {
   const fragment = readFragment(ResponsiveImage, responsiveImage);

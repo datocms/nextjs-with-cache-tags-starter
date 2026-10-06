@@ -9,7 +9,14 @@ const config = [
   ...nextCoreWebVitals,
   ...nextTypescript,
   {
-    ignores: ['.next/**', 'out/**', 'node_modules/**', 'lib/graphql-env.d.ts'],
+    ignores: [
+      '.next/**',
+      'out/**',
+      'node_modules/**',
+      'lib/graphql-env.d.ts',
+      'playwright-report/**',
+      'test-results/**',
+    ],
   },
 ];
 

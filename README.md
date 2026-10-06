@@ -25,6 +25,10 @@ Everything you need to know to build a Next.js project powered by DatoCMS Cache 
       - [`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`](#turso_database_url-turso_auth_token)
   - [Step 3: Install dependencies and download the DatoCMS GraphQL Schema](#step-3-install-dependencies-and-download-the-datocms-graphql-schema)
   - [Step 4: Run development server](#step-4-run-development-server)
+- [Testing](#testing)
+  - [Unit tests](#unit-tests)
+  - [End-to-end tests](#end-to-end-tests)
+  - [End-to-end tests against the real project](#end-to-end-tests-against-the-real-project)
 - [Deployment](#deployment)
 - [Useful resources to navigate the code](#useful-resources-to-navigate-the-code)
   - [Execution of GraphQL queries](#execution-of-graphql-queries)
@@ -82,9 +86,36 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Testing
+
+### Unit tests
+
+[Vitest](https://vitest.dev/) covers the building blocks in isolation: the cache tags parser, the query ID generation of `executeQuery()`, the Turso data layer (run against a throw-away, file-backed libSQL database) and the three route handlers:
+
+```bash
+npm test
+```
+
+### End-to-end tests
+
+[Playwright](https://playwright.dev/) builds and serves the app in production mode against a local mock of the DatoCMS Content Delivery API (`e2e/mock-cda/`) and a file-backed libSQL database, so no secrets are needed and the suite runs in CI (see `.github/workflows/ci.yml`). Besides checking that every page renders, it exercises the whole cache tags loop: it edits the mocked content, fires the "Cache Tag Invalidation" webhook and verifies that only the affected pages get re-generated.
+
+```bash
+npx playwright install chromium # first time only
+npm run test:e2e
+```
+
+### End-to-end tests against the real project
+
+The same kind of checks can run against the DatoCMS project and Turso database configured in `.env.local`. The invalidation round-trip additionally edits (and restores) the title of a post, which requires a full-access `DATOCMS_CMA_TOKEN` in `.env.local`:
+
+```bash
+npm run test:e2e:live
+```
+
 ## Deployment
 
-The project runs smoothly on both Vercel and Netlify. Just ensure to set the environment variables as previously explained. For your convenience, you can deploy the project on Vercel using this button:
+The project runs smoothly on both Vercel and Netlify. Just make sure to set the environment variables as previously explained. For your convenience, you can deploy the project on Vercel using this button:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdatocms%2Fnextjs-with-cache-tags-starter&env=PUBLIC_DATOCMS_API_TOKEN,WEBHOOK_TOKEN,TURSO_DATABASE_URL,TURSO_AUTH_TOKEN&envDescription=Please%20fill%20in%20the%20following%20information&envLink=https%3A%2F%2Fgithub.com%2Fdatocms%2Fnextjs-with-cache-tags-starter%3Ftab%3Dreadme-ov-file%23step-2-environment-variables)
 
